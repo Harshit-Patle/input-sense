@@ -38,6 +38,8 @@ input-sense helps detect such inputs early and improve overall data quality.
 - Detects sequential patterns
 - Detects reverse sequences
 - Identifies keyboard patterns
+- Supports returning all detected issues (`mode: "all"`)
+- Allows enabling/disabling specific rules
 - Lightweight and dependency-free
 - Frontend-friendly
 
@@ -78,6 +80,29 @@ if (result) {
 }
 ```
 
+---
+
+## Advanced Usage
+
+### Get all detected issues
+
+By default, `input-sense` returns only the first detected issue.  
+To get **all detected issues**, use `mode: "all"`.
+
+```js
+senseInput("aa", { mode: "all" });
+```
+
+### Disable specific rules
+
+You can disable specific validation rules if they are not relevant for your use case.
+
+```js
+senseInput("aa", {
+  mode: "all",
+  disable: ["repeatedChar"]
+});
+```
 ---
 
 ## Example Outputs
