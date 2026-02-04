@@ -1,6 +1,6 @@
 {
   "name": "input-sense",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Detects low-quality, fake, or placeholder user inputs beyond regex validation",
   "type": "module",
   "types": "index.d.ts",
