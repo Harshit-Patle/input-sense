@@ -1,5 +1,6 @@
 ![npm version](https://img.shields.io/npm/v/input-sense.svg)
 ![npm downloads](https://img.shields.io/npm/dw/input-sense.svg)
+![CI](https://github.com/Harshit-Patle/input-sense/actions/workflows/ci.yml/badge.svg)
 ![license](https://img.shields.io/github/license/Harshit-Patle/input-sense)
 
 ---
@@ -167,6 +168,13 @@ Backend Validation
 - Educational platforms
 - Frontend UX improvement
 - Pre-API input sanity checks
+
+---
+
+## Project Status
+
+This project is actively maintained.
+All core validation rules are covered by automated tests and enforced via CI.
 
 ---
 

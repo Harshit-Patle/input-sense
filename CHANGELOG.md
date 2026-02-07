@@ -3,6 +3,14 @@
 > ℹ️ Note: Versions prior to 0.4.0 were early experimental releases.
 > This changelog tracks stable, user-facing changes from 0.4.0 onward.
 
+## 0.7.0
+- Added ESLint and Prettier for consistent code quality
+- Added full test coverage for all validation rules
+- Added GitHub Actions CI to enforce tests on push and PR
+- Improved contributor experience and repository signals
+- No breaking changes
+
+
 ## 0.6.0
 
 - Added automated test suite using Vitest
