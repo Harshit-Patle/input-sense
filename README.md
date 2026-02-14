@@ -107,6 +107,72 @@ senseInput("aa", {
 });
 ```
 
+### Rule Configuration Examples
+
+You can fine-tune certain rules using the `rules` option.
+
+#### Customize minimum length sensitivity
+
+```js
+senseInput("hello", {
+  rules: {
+    minLength: {
+      minLength: 6
+    }
+  }
+});
+```
+This increases the minimum required length from the default value.
+
+#### Customize entropy (character diversity)
+```js
+senseInput("abcdef", {
+  rules: {
+    entropy: {
+      minLength: 6,
+      minRatio: 0.9
+    }
+  }
+});
+```
+This makes entropy detection more strict by requiring higher character diversity.
+
+#### Combine multiple rule configurations
+```js
+senseInput("aa", {
+  mode: "all",
+  rules: {
+    minLength: {
+      minLength: 5
+    },
+    entropy: {
+      minLength: 6,
+      minRatio: 0.6
+    }
+  }
+});
+```
+Multiple rules can be configured together, and defaults apply to any rule not configured.
+
+### When to use `mode: "all"`
+
+Use `mode: "all"` when:
+- You want to show multiple validation hints at once
+- You are building rich form UX
+- You want analytics or debugging insight
+
+Use the default mode when:
+- You only need the first blocking issue
+- You want fast, simple validation
+
+---
+
+## Rule Configuration
+
+Some rules support fine-grained configuration via the `rules` option.
+
+All rules have safe defaults, and unknown rule names are safely ignored.
+
 ---
 
 ## Example Outputs
@@ -140,6 +206,21 @@ Coverage is collected and reported on every commit via CI.
 
 ---
 
+## Mental Model
+
+Think of `input-sense` as an **intent checker**, not a validator.
+
+It runs a series of small, focused rules to answer one question:
+
+> “Does this input look meaningful for a human?”
+
+- Each rule checks a specific pattern
+- Rules run in a fixed order
+- By default, the first issue is returned
+- You can opt into collecting all issues
+
+---
+
 ## How it works
 
 The library runs multiple checks in a fixed order and returns the first detected issue.
@@ -155,7 +236,6 @@ input-sense (intent detection)
 ↓
 Backend Validation
 ```
-
 ---
 
 ## What input-sense does NOT do
@@ -165,6 +245,14 @@ Backend Validation
 - Does not block submissions automatically
 - Does not use AI
 - Does not store user data
+
+---
+
+## Limitations
+
+- This library does not guarantee semantic correctness
+- It does not understand language meaning
+- It should be used alongside traditional validation
 
 ---
 
@@ -183,6 +271,18 @@ Backend Validation
 
 This project is actively maintained.
 All core validation rules are covered by automated tests and enforced via CI.
+
+---
+
+## Quick Guide
+
+| Use case | Recommendation |
+|--------|----------------|
+Simple forms | Default mode |
+Rich UX | `mode: "all"` |
+Strict apps | Enable entropy tuning |
+JS projects | Rely on runtime behavior |
+TS projects | Enjoy full type safety |
 
 ---
 
