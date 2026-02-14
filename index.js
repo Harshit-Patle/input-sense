@@ -13,6 +13,8 @@ export function senseInput(value, options = {}) {
   const issues = [];
   // store not to use rules
   const disabledRules = options.disable || [];
+  // store configurations related to rules
+  const ruleConfigs = options.rules || {};
 
   // Rule: repeated characters
   if (!disabledRules.includes("repeatedChar")) {
@@ -34,7 +36,8 @@ export function senseInput(value, options = {}) {
 
   // Rule: minimum meaningful length
   if (!disabledRules.includes("minLength")) {
-    const minLengthResult = minLengthRule(value);
+    const minLengthConfig = ruleConfigs.minLength || {};
+    const minLengthResult = minLengthRule(value, minLengthConfig.minLength);
     if (minLengthResult) {
       if (mode === "all") issues.push(minLengthResult);
       else return minLengthResult;
@@ -70,7 +73,8 @@ export function senseInput(value, options = {}) {
 
   // Rule: character diversity / entropy
   if (!disabledRules.includes("entropy")) {
-    const entropyResult = entropyRule(value);
+    const entropyConfig = ruleConfigs.entropy || {};
+    const entropyResult = entropyRule(value, entropyConfig.minLength, entropyConfig.minRatio);
     if (entropyResult) {
       if (mode === "all") issues.push(entropyResult);
       else return entropyResult;
