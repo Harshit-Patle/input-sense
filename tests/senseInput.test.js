@@ -36,4 +36,25 @@ describe("senseInput", () => {
     const result = senseInput("aaaa", { mode: "all" });
     expect(result).toEqual(["Input looks like repeated characters"]);
   });
+
+  it("respects custom minLength rule config", () => {
+    const result = senseInput("hello", { rules: { minLength: { minLength: 6 } } });
+    expect(result).toContain("minimum 6");
+  });
+
+  it("respects custom entropy rule config", () => {
+    const result = senseInput("abcdef", { rules: { entropy: { minLength: 6, minRatio: 0.9 } } });
+    expect(result).toBeTruthy();
+  });
+
+  it("uses default rule values when no config is provided", () => {
+    const result = senseInput("abc", { disable: ["placeholderWord"] });
+    expect(result).toContain("too short");
+  });
+
+  it("returns all issues using custom rule configs in all mode", () => {
+    const result = senseInput("abc", { mode: "all", rules: { minLength: { minLength: 5 } } });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThan(0);
+  });
 });
