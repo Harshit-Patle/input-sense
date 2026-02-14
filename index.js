@@ -6,6 +6,24 @@ import { keyboardPatternRule } from "./rules/keyboardPattern.js";
 import { minLengthRule } from "./rules/minLength.js";
 import { entropyRule } from "./rules/entropyRule.js";
 
+const KNOWN_RULES = [
+  "repeatedChar",
+  "placeholderWord",
+  "minLength",
+  "sequential",
+  "reverseSequential",
+  "keyboardPattern",
+  "entropy"
+];
+
+if (process.env.NODE_ENV !== "production") {
+  disabledRules.forEach((rule) => {
+    if (!KNOWN_RULES.includes(rule)) {
+      console.warn(`[input-sense] Unknown rule "${rule}"`);
+    }
+  });
+}
+
 export function senseInput(value, options = {}) {
   // select mode type
   const mode = options.mode || "first";
