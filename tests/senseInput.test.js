@@ -6,4 +6,34 @@ describe("senseInput", () => {
     const result = senseInput("Harshit");
     expect(result).toBe(null);
   });
+
+  it("skip repeatedChar rule when disabled", () => {
+    const result = senseInput("aaaa", { disable: ["repeatedChar"] });
+    expect(result).toBe(null);
+  });
+
+  it("skip multiple rules when disabled", () => {
+    const result = senseInput("1234", { disable: ["sequential", "reverseSequential"] });
+    expect(result).toBe(null);
+  });
+
+  it("returns null when all rules are disabled", () => {
+    const result = senseInput("aaaa", { disable: ["repeatedChar", "placeholderWord", "minLength", "sequential", "reverseSequential", "keyboardPattern", "entropy"] });
+    expect(result).toBe(null);
+  });
+
+  it("ignores unknown disabled rules safely", () => {
+    const result = senseInput("aaaa", { disable: ["notARealRule"] });
+    expect(result).toBeTruthy();
+  });
+
+  it("does not include disabled rules in all mode", () => {
+    const result = senseInput("aaaa", { mode: "all", disable: ["repeatedChar"] });
+    expect(result).toBe(null);
+  });
+
+  it("returns issues array in all mode when rules are enabled", () => {
+    const result = senseInput("aaaa", { mode: "all" });
+    expect(result).toEqual(["Input looks like repeated characters"]);
+  });
 });
