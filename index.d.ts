@@ -1,3 +1,15 @@
+export type SenseMode = "first" | "all";
+
+export type RuleName =
+    | "repeatedChar"
+    | "placeholderWord"
+    | "minLength"
+    | "sequential"
+    | "reverseSequential"
+    | "keyboardPattern"
+    | "entropy"
+    | "symbolOnly";
+
 export interface MinLengthRuleConfig {
     minLength?: number;
 }
@@ -7,24 +19,15 @@ export interface EntropyRuleConfig {
     minRatio?: number;
 }
 
-export type RuleName =
-    | "repeatedChar"
-    | "placeholderWord"
-    | "minLength"
-    | "sequential"
-    | "reverseSequential"
-    | "keyboardPattern"
-    | "entropy";
-
-export interface RulesConfig {
+export interface RuleConfigs {
     minLength?: MinLengthRuleConfig;
     entropy?: EntropyRuleConfig;
 }
 
 export interface SenseInputOptions {
-    mode?: "first" | "all";
+    mode?: SenseMode;
     disable?: RuleName[];
-    rules?: RulesConfig;
+    rules?: RuleConfigs;
 }
 
 export function senseInput(
