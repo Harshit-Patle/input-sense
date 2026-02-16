@@ -57,4 +57,14 @@ describe("senseInput", () => {
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBeGreaterThan(0);
   });
+
+  it("detects symbol-only input via senseInput", () => {
+    const result = senseInput("-----");
+    expect(result).toContain("symbol");
+  });
+
+  it("skips symbolOnly rule when disabled", () => {
+    const result = senseInput("------", { disable: ["symbolOnly"] });
+    expect(result).toContain("diversity");
+  });
 });

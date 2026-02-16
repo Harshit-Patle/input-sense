@@ -5,6 +5,7 @@ import { reverseSequentialPatternRule } from "./rules/reverseSequentialPattern.j
 import { keyboardPatternRule } from "./rules/keyboardPattern.js";
 import { minLengthRule } from "./rules/minLength.js";
 import { entropyRule } from "./rules/entropyRule.js";
+import { symbolOnlyRule } from "./rules/symbolOnlyRule.js";
 
 export function senseInput(value, options = {}) {
   // select mode type
@@ -23,7 +24,8 @@ export function senseInput(value, options = {}) {
     "sequential",
     "reverseSequential",
     "keyboardPattern",
-    "entropy"
+    "entropy",
+    "symbolOnlyRule"
   ];
 
   if (process.env.NODE_ENV !== "production") {
@@ -40,6 +42,15 @@ export function senseInput(value, options = {}) {
     if (repeatedCharResult) {
       if (mode === "all") issues.push(repeatedCharResult);
       else return repeatedCharResult;
+    }
+  }
+
+  // Rule: symbol only / whitespace
+  if (!disabledRules.includes("symbolOnly")) {
+    const symbolOnlyResult = symbolOnlyRule(value);
+    if (symbolOnlyResult) {
+      if (mode === "all") issues.push(symbolOnlyResult);
+      else return symbolOnlyResult;
     }
   }
 
