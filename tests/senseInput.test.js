@@ -14,7 +14,7 @@ describe("senseInput", () => {
 
   it("skip multiple rules when disabled", () => {
     const result = senseInput("1234", { disable: ["sequential", "reverseSequential"] });
-    expect(result).toBe(null);
+    expect(result).contain("numbers");
   });
 
   it("returns null when all rules are disabled", () => {
@@ -66,5 +66,15 @@ describe("senseInput", () => {
   it("skips symbolOnly rule when disabled", () => {
     const result = senseInput("------", { disable: ["symbolOnly"] });
     expect(result).toContain("diversity");
+  });
+
+  it("detects numeric-only input via senseInput", () => {
+    const result = senseInput("123456");
+    expect(result).toContain("numbers");
+  });
+
+  it("skips numericOnly rule when disabled", () => {
+    const result = senseInput("123456", { disable: ["numericOnly"] });
+    expect(result).not.toContain("numbers");
   });
 });

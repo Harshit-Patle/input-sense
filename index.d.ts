@@ -8,7 +8,8 @@ export type RuleName =
     | "reverseSequential"
     | "keyboardPattern"
     | "entropy"
-    | "symbolOnly";
+    | "symbolOnly"
+    | "numericOnly";
 
 export interface MinLengthRuleConfig {
     minLength?: number;

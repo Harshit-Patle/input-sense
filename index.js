@@ -6,6 +6,7 @@ import { keyboardPatternRule } from "./rules/keyboardPattern.js";
 import { minLengthRule } from "./rules/minLength.js";
 import { entropyRule } from "./rules/entropyRule.js";
 import { symbolOnlyRule } from "./rules/symbolOnlyRule.js";
+import { numericOnlyRule } from "./rules/numericOnlyRule.js";
 
 export function senseInput(value, options = {}) {
   // select mode type
@@ -18,15 +19,16 @@ export function senseInput(value, options = {}) {
   const ruleConfigs = options.rules || {};
 
   const KNOWN_RULES = [
-    "repeatedChar",
-    "placeholderWord",
-    "minLength",
-    "sequential",
-    "reverseSequential",
-    "keyboardPattern",
-    "entropy",
-    "symbolOnlyRule"
-  ];
+  "repeatedChar",
+  "placeholderWord",
+  "minLength",
+  "sequential",
+  "reverseSequential",
+  "keyboardPattern",
+  "entropy",
+  "symbolOnly",
+  "numericOnly"
+];
 
   if (process.env.NODE_ENV !== "production") {
     disabledRules.forEach((rule) => {
@@ -51,6 +53,15 @@ export function senseInput(value, options = {}) {
     if (symbolOnlyResult) {
       if (mode === "all") issues.push(symbolOnlyResult);
       else return symbolOnlyResult;
+    }
+  }
+
+  // Rule: numeric-only input
+  if (!disabledRules.includes("numericOnly")) {
+    const numericOnlyResult = numericOnlyRule(value);
+    if (numericOnlyResult) {
+      if (mode === "all") issues.push(numericOnlyResult);
+      else return numericOnlyResult;
     }
   }
 
