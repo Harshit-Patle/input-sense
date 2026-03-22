@@ -44,6 +44,10 @@ input-sense helps detect such inputs early and improve overall data quality.
 - Lightweight and dependency-free
 - Frontend-friendly
 - Includes automated tests for core validation logic
+- Detects symbol-only or whitespace inputs
+- Detects numeric-only inputs
+- Detects repeated word patterns
+- Detects low vowel ratio (non-human-like input)
 
 ---
 
@@ -192,6 +196,15 @@ senseInput("9876");
 
 senseInput("qwerty");
 // Input looks like a keyboard pattern
+
+senseInput("123456");
+// Input contains only numbers and looks non-meaningful
+
+senseInput("test test test");
+// Input contains repeated words and looks non-meaningful
+
+senseInput("bcdfgh");
+// Input has very low vowel presence and looks non-meaningful
 
 senseInput("Harshit");
 // null
