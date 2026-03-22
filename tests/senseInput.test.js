@@ -77,4 +77,14 @@ describe("senseInput", () => {
     const result = senseInput("123456", { disable: ["numericOnly"] });
     expect(result).not.toContain("numbers");
   });
+
+  it("detects repeated words via senseInput", () => {
+    const result = senseInput("test test test");
+    expect(result).toContain("repeated words");
+  });
+
+  it("skips repeatedWord rule when disabled", () => {
+    const result = senseInput("test test test", { disable: ["repeatedWord"] });
+    expect(result).not.toContain("repeated words");
+  });
 });

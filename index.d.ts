@@ -9,7 +9,8 @@ export type RuleName =
     | "keyboardPattern"
     | "entropy"
     | "symbolOnly"
-    | "numericOnly";
+    | "numericOnly"
+    | "repeatedWord";
 
 export interface MinLengthRuleConfig {
     minLength?: number;

@@ -7,6 +7,7 @@ import { minLengthRule } from "./rules/minLength.js";
 import { entropyRule } from "./rules/entropyRule.js";
 import { symbolOnlyRule } from "./rules/symbolOnlyRule.js";
 import { numericOnlyRule } from "./rules/numericOnlyRule.js";
+import { repeatedWordRule } from "./rules/repeatedWordRule.js";
 
 export function senseInput(value, options = {}) {
   // select mode type
@@ -19,16 +20,17 @@ export function senseInput(value, options = {}) {
   const ruleConfigs = options.rules || {};
 
   const KNOWN_RULES = [
-  "repeatedChar",
-  "placeholderWord",
-  "minLength",
-  "sequential",
-  "reverseSequential",
-  "keyboardPattern",
-  "entropy",
-  "symbolOnly",
-  "numericOnly"
-];
+    "repeatedChar",
+    "placeholderWord",
+    "minLength",
+    "sequential",
+    "reverseSequential",
+    "keyboardPattern",
+    "entropy",
+    "symbolOnly",
+    "numericOnly",
+    "repeatedWord"
+  ];
 
   if (process.env.NODE_ENV !== "production") {
     disabledRules.forEach((rule) => {
@@ -71,6 +73,15 @@ export function senseInput(value, options = {}) {
     if (placeholderWordResult) {
       if (mode === "all") issues.push(placeholderWordResult);
       else return placeholderWordResult;
+    }
+  }
+
+  // Rule: repeated words
+  if (!disabledRules.includes("repeatedWord")) {
+    const repeatedWordResult = repeatedWordRule(value);
+    if (repeatedWordResult) {
+      if (mode === "all") issues.push(repeatedWordResult);
+      else return repeatedWordResult;
     }
   }
 
