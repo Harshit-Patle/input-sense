@@ -87,4 +87,9 @@ describe("senseInput", () => {
     const result = senseInput("test test test", { disable: ["repeatedWord"] });
     expect(result).not.toContain("repeated words");
   });
+
+  it("detects low vowel ratio via senseInput", () => {
+    const result = senseInput("bcdfgh");
+    expect(result).toContain("vowel");
+  });
 });

@@ -8,6 +8,7 @@ import { entropyRule } from "./rules/entropyRule.js";
 import { symbolOnlyRule } from "./rules/symbolOnlyRule.js";
 import { numericOnlyRule } from "./rules/numericOnlyRule.js";
 import { repeatedWordRule } from "./rules/repeatedWordRule.js";
+import { vowelRatioRule } from "./rules/vowelRatioRule.js";
 
 export function senseInput(value, options = {}) {
   // select mode type
@@ -29,7 +30,8 @@ export function senseInput(value, options = {}) {
     "entropy",
     "symbolOnly",
     "numericOnly",
-    "repeatedWord"
+    "repeatedWord",
+    "lowVowelRatio"
   ];
 
   if (process.env.NODE_ENV !== "production") {
@@ -129,6 +131,15 @@ export function senseInput(value, options = {}) {
     if (entropyResult) {
       if (mode === "all") issues.push(entropyResult);
       else return entropyResult;
+    }
+  }
+
+  // Rule: low vowel ratio
+  if (!disabledRules.includes("lowVowelRatio")) {
+    const vowelResult = vowelRatioRule(value);
+    if (vowelResult) {
+      if (mode === "all") issues.push(vowelResult);
+      else return vowelResult;
     }
   }
 

@@ -10,7 +10,8 @@ export type RuleName =
     | "entropy"
     | "symbolOnly"
     | "numericOnly"
-    | "repeatedWord";
+    | "repeatedWord"
+    | "lowVowelRatio";
 
 export interface MinLengthRuleConfig {
     minLength?: number;
