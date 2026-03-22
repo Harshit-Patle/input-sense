@@ -3,6 +3,15 @@
 > ℹ️ Note: Versions prior to 0.4.0 were early experimental releases.
 > This changelog tracks stable, user-facing changes from 0.4.0 onward.
 
+## 0.10.0
+- Added symbol-only input detection rule
+- Added numeric-only input detection rule
+- Added repeated word pattern detection
+- Added low vowel ratio heuristic rule
+- Improved overall input quality detection
+- No breaking changes
+
+
 ## 0.9.0
 - Added configurable rule tuning for `minLength` and `entropy`
 - Added rule enable/disable support with safe defaults
