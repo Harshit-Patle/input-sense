@@ -5,6 +5,12 @@
   "type": "module",
   "types": "index.d.ts",
   "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    }
+  },
   "keywords": [
     "validation",
     "input",
