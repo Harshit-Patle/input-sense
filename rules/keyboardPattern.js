@@ -1,8 +1,8 @@
-export function keyboardPatternRule(value) {
+export function keyboardPatternRule(value, minLength = 3) {
   if (!value) return null;
 
   const normalized = value.trim().toLowerCase();
-  if (normalized.length < 3) return null;
+  if (normalized.length < minLength) return null;
 
   const keyboardPatterns = [
     "qwertyuiop",
