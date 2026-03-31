@@ -44,7 +44,8 @@ export function senseInput(value, options = {}) {
 
   // Rule: repeated characters
   if (!disabledRules.includes("repeatedChar")) {
-    const repeatedCharResult = repeatedCharRule(value);
+    const repeatedCharConfig = ruleConfigs.repeatedChar || {};
+    const repeatedCharResult = repeatedCharRule(value, repeatedCharConfig.threshold);
     if (repeatedCharResult) {
       if (mode === "all") issues.push(repeatedCharResult);
       else return repeatedCharResult;
@@ -80,7 +81,8 @@ export function senseInput(value, options = {}) {
 
   // Rule: repeated words
   if (!disabledRules.includes("repeatedWord")) {
-    const repeatedWordResult = repeatedWordRule(value);
+    const repeatedWordConfig = ruleConfigs.repeatedWord || {};
+    const repeatedWordResult = repeatedWordRule(value, repeatedWordConfig.maxAllowedRatio);
     if (repeatedWordResult) {
       if (mode === "all") issues.push(repeatedWordResult);
       else return repeatedWordResult;
@@ -117,7 +119,8 @@ export function senseInput(value, options = {}) {
 
   // Rule: keyboard patterns
   if (!disabledRules.includes("keyboardPattern")) {
-    const keyboardPatternResult = keyboardPatternRule(value);
+    const keyboardPatternConfig = ruleConfigs.keyboardPattern || {};
+    const keyboardPatternResult = keyboardPatternRule(value, keyboardPatternConfig.minLength);
     if (keyboardPatternResult) {
       if (mode === "all") issues.push(keyboardPatternResult);
       else return keyboardPatternResult;
@@ -136,7 +139,8 @@ export function senseInput(value, options = {}) {
 
   // Rule: low vowel ratio
   if (!disabledRules.includes("lowVowelRatio")) {
-    const vowelResult = vowelRatioRule(value);
+    const vowelConfig = ruleConfigs.lowVowelRatio || {};
+    const vowelResult = vowelRatioRule(value, vowelConfig.minLength, vowelConfig.minRatio);
     if (vowelResult) {
       if (mode === "all") issues.push(vowelResult);
       else return vowelResult;
