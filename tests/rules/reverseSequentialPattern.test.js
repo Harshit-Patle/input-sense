@@ -11,4 +11,18 @@ describe("reverseSequentialPatternRule", () => {
         const result = reverseSequentialPatternRule("Harshit");
         expect(result).toBe(null);
     });
+
+    it("returns null for empty input", () => {
+        expect(reverseSequentialPatternRule("")).toBe(null);
+        expect(reverseSequentialPatternRule(null)).toBe(null);
+    });
+
+    it("returns null for non-sequential edge case", () => {
+        expect(reverseSequentialPatternRule("abcd")).toBe(null);
+    });
+
+    it("returns null for input shorter than 3 characters", () => {
+        expect(reverseSequentialPatternRule("98")).toBe(null);
+        expect(reverseSequentialPatternRule("z")).toBe(null);
+    });
 });

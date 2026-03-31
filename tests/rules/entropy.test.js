@@ -11,4 +11,9 @@ describe("entropyRule", () => {
     const result = entropyRule("a1b2c3");
     expect(result).toBe(null);
   });
+
+  it("returns null for empty input", () => {
+    expect(entropyRule("")).toBe(null);
+    expect(entropyRule(null)).toBe(null);
+  });
 });

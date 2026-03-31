@@ -26,4 +26,9 @@ describe("keyboardPatternRule",()=>{
         const result = keyboardPatternRule("qwe");
         expect(result).toBeTruthy();
     });
+
+    it("returns null for empty input", () => {
+        expect(keyboardPatternRule("")).toBe(null);
+        expect(keyboardPatternRule(null)).toBe(null);
+    });
 });

@@ -31,4 +31,13 @@ describe("vowelRatioRule", () => {
         const result = vowelRatioRule("bcdfgh");
         expect(result).toBeTruthy();
     });
+
+    it("returns null for empty input", () => {
+        expect(vowelRatioRule("")).toBe(null);
+        expect(vowelRatioRule(null)).toBe(null);
+    });
+
+    it("returns null for input with no letters", () => {
+        expect(vowelRatioRule("12345")).toBe(null);
+    });
 });

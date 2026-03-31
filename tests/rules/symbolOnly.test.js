@@ -13,4 +13,9 @@ describe("symbolOnlyRule", () => {
         expect(symbolOnlyRule("a-1")).toBe(null);
         expect(symbolOnlyRule("hello!")).toBe(null);
     });
+
+    it("returns null for empty input", () => {
+        expect(symbolOnlyRule("")).toBe(null);
+        expect(symbolOnlyRule(null)).toBe(null);
+    });
 });

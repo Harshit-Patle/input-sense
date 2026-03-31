@@ -129,4 +129,78 @@ describe("senseInput", () => {
     const result = senseInput("bcdf", { rules: { lowVowelRatio: { minLength: 5 } } });
     expect(result).toBe(null);
   });
+
+  // mode: "all" branch coverage
+  it("returns all issues including keyboardPattern in all mode", () => {
+    const result = senseInput("qwerty", { mode: "all", disable: ["minLength", "entropy"] });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.some(r => r.includes("keyboard"))).toBe(true);
+  });
+
+  it("returns all issues including entropy in all mode", () => {
+    const result = senseInput("aaaabb", { mode: "all", disable: ["repeatedChar"] });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.some(r => r.includes("diversity"))).toBe(true);
+  });
+
+  it("returns all issues including sequential in all mode", () => {
+    const result = senseInput("1234", {
+      mode: "all",
+      disable: ["numericOnly", "repeatedChar", "symbolOnly", "placeholderWord", "repeatedWord", "minLength"]
+    });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.some(r => r.includes("sequential"))).toBe(true);
+  });
+
+  it("returns all issues including reverseSequential in all mode", () => {
+    const result = senseInput("9876", {
+      mode: "all",
+      disable: ["numericOnly", "repeatedChar", "symbolOnly", "placeholderWord", "repeatedWord", "minLength"]
+    });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.some(r => r.includes("reverse"))).toBe(true);
+  });
+
+  it("returns sequential issue in first mode", () => {
+    const result = senseInput("1234", {
+      disable: ["numericOnly", "repeatedChar", "symbolOnly", "placeholderWord", "repeatedWord", "minLength"]
+    });
+    expect(result).toContain("sequential");
+  });
+
+  it("returns reverseSequential issue in first mode", () => {
+    const result = senseInput("9876", {
+      disable: ["numericOnly", "repeatedChar", "symbolOnly", "placeholderWord", "repeatedWord", "minLength"]
+    });
+    expect(result).toContain("reverse");
+  });
+
+  it("returns symbolOnly issue in first mode", () => {
+    const result = senseInput("----");
+    expect(result).toContain("symbol");
+  });
+
+  // warn branch coverage
+  it("warns about unknown rule only in non-production", () => {
+    const original = process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
+    const result = senseInput("aaaa", { disable: ["unknownRule"] });
+    expect(result).toBeTruthy();
+    process.env.NODE_ENV = original;
+  });
+
+  it("covers reverseSequential else return branch directly", () => {
+    const result = senseInput("9876", {
+      disable: ["numericOnly", "repeatedChar", "symbolOnly", "placeholderWord", "repeatedWord", "minLength", "sequential"]
+    });
+    expect(result).toContain("reverse");
+  });
+
+  it("covers symbolOnly falsy branch in all mode", () => {
+    const result = senseInput("hello", {
+      mode: "all",
+      disable: ["repeatedChar", "placeholderWord", "repeatedWord", "minLength", "sequential", "reverseSequential", "keyboardPattern", "entropy", "lowVowelRatio", "numericOnly"]
+    });
+    expect(result).toBe(null);
+  });
 });

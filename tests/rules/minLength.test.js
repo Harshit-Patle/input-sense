@@ -11,4 +11,9 @@ describe("minLengthRule", () => {
     const result = minLengthRule("abcd");
     expect(result).toBe(null);
   });
+
+  it("returns null for empty input", () => {
+    expect(minLengthRule("")).toBe(null);
+    expect(minLengthRule(null)).toBe(null);
+  });
 });

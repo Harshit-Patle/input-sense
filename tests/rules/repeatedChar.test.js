@@ -26,4 +26,9 @@ describe("repeatedCharRule", () => {
     const result = repeatedCharRule("aaaa");
     expect(result).toBeTruthy();
   });
+
+  it("returns null for empty input", () => {
+    expect(repeatedCharRule("")).toBe(null);
+    expect(repeatedCharRule(null)).toBe(null);
+  });
 });

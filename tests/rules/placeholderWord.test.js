@@ -11,4 +11,9 @@ describe("placeholderWordRule", () => {
         const result = placeholderWordRule("Harshit");
         expect(result).toBe(null);
     });
+
+    it("returns null for empty input", () => {
+        expect(placeholderWordRule("")).toBe(null);
+        expect(placeholderWordRule(null)).toBe(null);
+    });
 });

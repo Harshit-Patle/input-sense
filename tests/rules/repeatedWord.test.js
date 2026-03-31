@@ -26,4 +26,17 @@ describe("repeatedWordRule", () => {
         const result = repeatedWordRule("test test");
         expect(result).toBeTruthy();
     });
+
+    it("returns null for empty input", () => {
+        expect(repeatedWordRule("")).toBe(null);
+        expect(repeatedWordRule(null)).toBe(null);
+    });
+
+    it("returns null for single word input", () => {
+        expect(repeatedWordRule("hello")).toBe(null);
+    });
+
+    it("returns null for whitespace-only input", () => {
+        expect(repeatedWordRule("   ")).toBe(null);
+    });
 });
