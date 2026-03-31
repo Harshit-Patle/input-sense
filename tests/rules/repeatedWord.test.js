@@ -11,4 +11,19 @@ describe("repeatedWordRule", () => {
         expect(repeatedWordRule("hello world")).toBe(null);
         expect(repeatedWordRule("this is valid")).toBe(null);
     });
+
+    it("allows input when duplication is under custom maxAllowedRatio", () => {
+        const result = repeatedWordRule("hey hey there", 0.6);
+        expect(result).toBe(null);
+    });
+
+    it("flags input when duplication exceeds custom maxAllowedRatio", () => {
+        const result = repeatedWordRule("test test test", 0.3);
+        expect(result).toBeTruthy();
+    });
+
+    it("uses default behaviour when no maxAllowedRatio is provided", () => {
+        const result = repeatedWordRule("test test");
+        expect(result).toBeTruthy();
+    });
 });

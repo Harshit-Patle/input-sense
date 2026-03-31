@@ -11,4 +11,19 @@ describe("keyboardPatternRule",()=>{
         const result=keyboardPatternRule("Harshit");
         expect(result).toBe(null);
     });
+
+    it("skips detection when input is under custom minLength", () => {
+        const result = keyboardPatternRule("qw", 5);
+        expect(result).toBe(null);
+    });
+
+    it("flags input when it meets custom minLength and is a keyboard pattern", () => {
+        const result = keyboardPatternRule("qwerty", 5);
+        expect(result).toBeTruthy();
+    });
+
+    it("uses default minLength when no config is provided", () => {
+        const result = keyboardPatternRule("qwe");
+        expect(result).toBeTruthy();
+    });
 });

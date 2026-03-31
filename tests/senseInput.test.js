@@ -92,4 +92,41 @@ describe("senseInput", () => {
     const result = senseInput("bcdfgh");
     expect(result).toContain("vowel");
   });
+
+  it("respects custom repeatedChar threshold config", () => {
+    const result = senseInput("aaaa", {
+      disable: ["minLength"],
+      rules: { repeatedChar: { threshold: 5 } }
+    });
+    expect(result).toBe(null);
+  });
+
+  it("respects custom repeatedWord maxAllowedRatio config", () => {
+    const result = senseInput("hello hey there", {
+      disable: ["entropy"],
+      rules: { repeatedWord: { maxAllowedRatio: 0.6 } }
+    });
+    expect(result).toBe(null);
+  });
+
+  it("respects custom keyboardPattern minLength config", () => {
+    const result = senseInput("qwer", {
+      disable: ["minLength"],
+      rules: { keyboardPattern: { minLength: 5 } }
+    });
+    expect(result).toBe(null);
+  });
+
+  it("respects custom lowVowelRatio minRatio config", () => {
+    const result = senseInput("bcdafg", {
+      disable: ["entropy"],
+      rules: { lowVowelRatio: { minRatio: 0.1 } }
+    });
+    expect(result).toBe(null);
+  });
+
+  it("respects custom lowVowelRatio minLength config", () => {
+    const result = senseInput("bcdf", { rules: { lowVowelRatio: { minLength: 5 } } });
+    expect(result).toBe(null);
+  });
 });
