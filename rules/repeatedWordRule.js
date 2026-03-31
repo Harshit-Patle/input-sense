@@ -1,17 +1,16 @@
-export function repeatedWordRule(value) {
+export function repeatedWordRule(value, maxAllowedRatio = 0) {
     if (!value) return null;
 
     const normalized = value.trim().toLowerCase();
     if (normalized.length === 0) return null;
 
     const words = normalized.split(/\s+/);
-
-    // Only meaningful if multiple words
     if (words.length < 2) return null;
 
     const uniqueWords = new Set(words);
+    const duplicationRatio = 1 - uniqueWords.size / words.length;
 
-    if (uniqueWords.size === 1) {
+    if (duplicationRatio > maxAllowedRatio) {
         return "Input contains repeated words and looks non-meaningful";
     }
 
