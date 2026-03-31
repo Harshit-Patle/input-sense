@@ -38,7 +38,7 @@ describe("senseInput", () => {
   });
 
   it("respects custom minLength rule config", () => {
-    const result = senseInput("hello", { rules: { minLength: { minLength: 6 } } });
+    const result = senseInput("valid", { rules: { minLength: { minLength: 6 } } });
     expect(result).toContain("minimum 6");
   });
 
@@ -202,5 +202,12 @@ describe("senseInput", () => {
       disable: ["repeatedChar", "placeholderWord", "repeatedWord", "minLength", "sequential", "reverseSequential", "keyboardPattern", "entropy", "lowVowelRatio", "numericOnly"]
     });
     expect(result).toBe(null);
+  });
+
+  it("respects custom placeholderWord customWords config", () => {
+    const result = senseInput("mycustomword", {
+      rules: { placeholderWord: { customWords: ["mycustomword"] } }
+    });
+    expect(result).toContain("placeholder");
   });
 });
