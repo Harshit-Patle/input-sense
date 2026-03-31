@@ -210,4 +210,34 @@ describe("senseInput", () => {
     });
     expect(result).toContain("placeholder");
   });
+
+  it("returns structured object in detailed mode for first issue", () => {
+    const result = senseInput("aaaa", { mode: "detailed" });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result[0]).toHaveProperty("rule", "repeatedChar");
+    expect(result[0]).toHaveProperty("message");
+  });
+
+  it("returns all structured objects in detailed mode", () => {
+    const result = senseInput("1234", {
+      mode: "detailed",
+      disable: ["numericOnly", "repeatedChar", "symbolOnly", "placeholderWord", "repeatedWord", "minLength"]
+    });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.every(i => "rule" in i && "message" in i)).toBe(true);
+  });
+
+  it("returns null in detailed mode for valid input", () => {
+    const result = senseInput("Harshit", { mode: "detailed" });
+    expect(result).toBe(null);
+  });
+
+  it("does not break existing first mode behaviour after detailed mode added", () => {
+    expect(senseInput("aaaa")).toBe("Input looks like repeated characters");
+  });
+
+  it("does not break existing all mode behaviour after detailed mode added", () => {
+    const result = senseInput("aaaa", { mode: "all" });
+    expect(result).toEqual(["Input looks like repeated characters"]);
+  });
 });
