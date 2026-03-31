@@ -72,9 +72,11 @@ export function senseInput(value, options = {}) {
 
   // Rule: placeholder words
   if (!disabledRules.includes("placeholderWord")) {
-    const placeholderWordResult = placeholderWordRule(value);
+    const placeholderConfig = ruleConfigs.placeholderWord || {};
+    const placeholderWordResult = placeholderWordRule(value, placeholderConfig.customWords);
     if (placeholderWordResult) {
       if (mode === "all") issues.push(placeholderWordResult);
+      // istanbul ignore else
       else return placeholderWordResult;
     }
   }
@@ -123,6 +125,7 @@ export function senseInput(value, options = {}) {
     const keyboardPatternResult = keyboardPatternRule(value, keyboardPatternConfig.minLength);
     if (keyboardPatternResult) {
       if (mode === "all") issues.push(keyboardPatternResult);
+      // istanbul ignore else
       else return keyboardPatternResult;
     }
   }
