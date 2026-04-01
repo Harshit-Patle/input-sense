@@ -35,14 +35,19 @@ input-sense helps detect such inputs early and improve overall data quality.
 ## Features
 
 - Detects repeated characters
-- Flags placeholder words
+- Flags placeholder words (38 built-in + custom words support)
 - Detects sequential patterns
 - Detects reverse sequences
 - Identifies keyboard patterns
 - Supports returning all detected issues (`mode: "all"`)
+- Supports structured output with rule names (`mode: "detailed"`)
 - Allows enabling/disabling specific rules
+- Supports per-rule configuration for fine-grained tuning
+- Batch validation for multiple form fields (`senseInputBatch`)
+- Runtime rule discovery (`listRules`)
 - Lightweight and dependency-free
 - Frontend-friendly
+- Full TypeScript support with per-mode return type inference
 - Includes automated tests for core validation logic
 - Detects symbol-only or whitespace inputs
 - Detects numeric-only inputs
@@ -93,16 +98,61 @@ if (result) {
 
 ### Get all detected issues
 
-By default, `input-sense` returns only the first detected issue.  
+By default, `input-sense` returns only the first detected issue.
 To get **all detected issues**, use `mode: "all"`.
 
 ```js
 senseInput("aa", { mode: "all" });
 ```
 
-### Disable specific rules
+### Get structured output with rule names
 
-You can disable specific validation rules if they are not relevant for your use case.
+Use `mode: "detailed"` to get back an array of `{ rule, message }` objects.
+This is useful when you want to show different UI feedback per rule.
+
+```js
+senseInput("aaaa", { mode: "detailed" });
+// [{ rule: "repeatedChar", message: "Input looks like repeated characters" }]
+```
+
+### Validate multiple fields at once
+
+Use `senseInputBatch` to validate an entire form object in one call.
+It accepts the same options as `senseInput` and applies them to every field.
+
+```js
+import { senseInputBatch } from "input-sense";
+
+senseInputBatch({
+  username: "aaaa",
+  email: "test",
+  bio: "Harshit"
+});
+// { username: "Input looks like repeated characters", email: "Input looks like a placeholder word", bio: null }
+```
+
+Works with all modes:
+
+```js
+senseInputBatch({ username: "aaaa" }, { mode: "detailed" });
+// { username: [{ rule: "repeatedChar", message: "Input looks like repeated characters" }] }
+```
+
+### Discover available rules at runtime
+
+Use `listRules` to get all available rule names in execution order.
+
+```js
+import { listRules } from "input-sense";
+
+listRules();
+// ["repeatedChar", "symbolOnly", "numericOnly", "placeholderWord", "repeatedWord",
+//  "minLength", "sequential", "reverseSequential", "keyboardPattern", "entropy", "lowVowelRatio"]
+```
+
+This is useful for validating your `disable` array before passing it to `senseInput`.
+
+### Disable specific rules
 
 ```js
 senseInput("aa", {
@@ -113,69 +163,121 @@ senseInput("aa", {
 
 ### Rule Configuration Examples
 
-You can fine-tune certain rules using the `rules` option.
+You can fine-tune rules using the `rules` option.
 
-#### Customize minimum length sensitivity
+#### repeatedChar — custom repetition threshold
+
+```js
+senseInput("aaa", {
+  rules: {
+    repeatedChar: { threshold: 4 }
+  }
+});
+// null — only flags when 5+ repetitions (threshold + 1)
+```
+
+#### placeholderWord — add custom words
+
+```js
+senseInput("mycustomword", {
+  rules: {
+    placeholderWord: { customWords: ["mycustomword"] }
+  }
+});
+// "Input looks like a placeholder word"
+```
+
+#### keyboardPattern — custom minimum length
+
+```js
+senseInput("qw", {
+  rules: {
+    keyboardPattern: { minLength: 5 }
+  }
+});
+// null — input is too short to check
+```
+
+#### repeatedWord — allow some duplication
+
+```js
+senseInput("hey hey there", {
+  rules: {
+    repeatedWord: { maxAllowedRatio: 0.6 }
+  }
+});
+// null — duplication ratio is within the allowed limit
+```
+
+#### lowVowelRatio — relax vowel requirement
+
+```js
+senseInput("bcdfgh", {
+  rules: {
+    lowVowelRatio: { minRatio: 0.1 }
+  }
+});
+// null — ratio threshold is relaxed
+```
+
+#### minLength — custom minimum length
 
 ```js
 senseInput("hello", {
   rules: {
-    minLength: {
-      minLength: 6
-    }
+    minLength: { minLength: 6 }
   }
 });
+// "Input is too short to be meaningful (minimum 6 characters)"
 ```
-This increases the minimum required length from the default value.
 
-#### Customize entropy (character diversity)
+#### entropy — custom character diversity
+
 ```js
 senseInput("abcdef", {
   rules: {
-    entropy: {
-      minLength: 6,
-      minRatio: 0.9
-    }
+    entropy: { minLength: 6, minRatio: 0.9 }
   }
 });
 ```
-This makes entropy detection more strict by requiring higher character diversity.
 
 #### Combine multiple rule configurations
+
 ```js
 senseInput("aa", {
   mode: "all",
   rules: {
-    minLength: {
-      minLength: 5
-    },
-    entropy: {
-      minLength: 6,
-      minRatio: 0.6
-    }
+    minLength: { minLength: 5 },
+    entropy: { minLength: 6, minRatio: 0.6 }
   }
 });
 ```
-Multiple rules can be configured together, and defaults apply to any rule not configured.
 
-### When to use `mode: "all"`
+### When to use each mode
 
-Use `mode: "all"` when:
-- You want to show multiple validation hints at once
-- You are building rich form UX
-- You want analytics or debugging insight
-
-Use the default mode when:
-- You only need the first blocking issue
-- You want fast, simple validation
+| Mode | Returns | Use when |
+|------|---------|----------|
+| `"first"` (default) | `string \| null` | You only need the first blocking issue |
+| `"all"` | `string[] \| null` | You want to show all issues at once |
+| `"detailed"` | `{ rule, message }[] \| null` | You need to know which rule fired |
 
 ---
 
-## Rule Configuration
+## Rule Configuration Reference
 
-Some rules support fine-grained configuration via the `rules` option.
+| Rule | Config option | Type | Default | Description |
+|------|--------------|------|---------|-------------|
+| `repeatedChar` | `threshold` | `number` | `0` | Min repetitions before flagging |
+| `placeholderWord` | `customWords` | `string[]` | `[]` | Extra words to flag |
+| `keyboardPattern` | `minLength` | `number` | `3` | Min length before checking |
+| `repeatedWord` | `maxAllowedRatio` | `number` | `0` | Max allowed duplication ratio |
+| `lowVowelRatio` | `minLength` | `number` | `5` | Min length before checking |
+| `lowVowelRatio` | `minRatio` | `number` | `0.2` | Min vowel ratio required |
+| `minLength` | `minLength` | `number` | `4` | Min required input length |
+| `entropy` | `minLength` | `number` | `6` | Min length before checking |
+| `entropy` | `minRatio` | `number` | `0.6` | Min character diversity ratio |
 
-All rules have safe defaults, and unknown rule names are safely ignored.
+All rules have safe defaults. Unknown rule names in `rules` config are safely ignored.
 
 ---
 
@@ -183,28 +285,28 @@ All rules have safe defaults, and unknown rule names are safely ignored.
 
 ```js
 senseInput("aaaa");
-// Input looks like repeated characters
+// "Input looks like repeated characters"
 
 senseInput("test");
-// Input looks like a placeholder word
+// "Input looks like a placeholder word"
 
 senseInput("1234");
-// Input looks like a sequential pattern
+// "Input looks like a sequential pattern"
 
 senseInput("9876");
-// Input looks like a reverse sequential pattern
+// "Input looks like a reverse sequential pattern"
 
 senseInput("qwerty");
-// Input looks like a keyboard pattern
+// "Input looks like a keyboard pattern"
 
 senseInput("123456");
-// Input contains only numbers and looks non-meaningful
+// "Input contains only numbers and looks non-meaningful"
 
 senseInput("test test test");
-// Input contains repeated words and looks non-meaningful
+// "Input contains repeated words and looks non-meaningful"
 
 senseInput("bcdfgh");
-// Input has very low vowel presence and looks non-meaningful
+// "Input has very low vowel presence and looks non-meaningful"
 
 senseInput("Harshit");
 // null
@@ -214,8 +316,9 @@ senseInput("Harshit");
 
 ## Test Coverage
 
-This project uses automated test coverage to ensure reliability.  
+This project uses automated test coverage to ensure reliability.
 Coverage is collected and reported on every commit via CI.
+All 11 rule files maintain 100% coverage across statements, branches, functions, and lines.
 
 ---
 
@@ -225,12 +328,12 @@ Think of `input-sense` as an **intent checker**, not a validator.
 
 It runs a series of small, focused rules to answer one question:
 
-> “Does this input look meaningful for a human?”
+> "Does this input look meaningful for a human?"
 
 - Each rule checks a specific pattern
 - Rules run in a fixed order
 - By default, the first issue is returned
-- You can opt into collecting all issues
+- You can opt into collecting all issues or structured output
 
 ---
 
@@ -249,6 +352,7 @@ input-sense (intent detection)
 ↓
 Backend Validation
 ```
+
 ---
 
 ## What input-sense does NOT do
@@ -290,12 +394,14 @@ All core validation rules are covered by automated tests and enforced via CI.
 ## Quick Guide
 
 | Use case | Recommendation |
-|--------|----------------|
-Simple forms | Default mode |
-Rich UX | `mode: "all"` |
-Strict apps | Enable entropy tuning |
-JS projects | Rely on runtime behavior |
-TS projects | Enjoy full type safety |
+|----------|----------------|
+| Simple forms | Default mode |
+| Rich UX | `mode: "all"` |
+| Rule-specific UX | `mode: "detailed"` |
+| Full form validation | `senseInputBatch` |
+| Strict apps | Enable entropy tuning |
+| JS projects | Rely on runtime behavior |
+| TS projects | Enjoy full type safety |
 
 ---
 
@@ -307,5 +413,5 @@ TS projects | Enjoy full type safety |
 
 ## License
 
-This project is licensed under the **MIT License**.  
+This project is licensed under the **MIT License**.
 See the [LICENSE](./LICENSE) file for details.
