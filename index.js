@@ -130,3 +130,17 @@ export function senseInput(value, options = {}) {
 
   return null;
 }
+
+export function senseInputBatch(fields, options = {}) {
+  if (!fields || typeof fields !== "object" || Array.isArray(fields)) {
+    throw new TypeError("[input-sense] senseInputBatch expects a plain object of field names to values");
+  }
+
+  const results = {};
+
+  for (const [field, value] of Object.entries(fields)) {
+    results[field] = senseInput(value, options);
+  }
+
+  return results;
+}
