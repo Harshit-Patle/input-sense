@@ -144,3 +144,19 @@ export function senseInputBatch(fields, options = {}) {
 
   return results;
 }
+
+export function listRules() {
+  return [
+    "repeatedChar",
+    "symbolOnly",
+    "numericOnly",
+    "placeholderWord",
+    "repeatedWord",
+    "minLength",
+    "sequential",
+    "reverseSequential",
+    "keyboardPattern",
+    "entropy",
+    "lowVowelRatio"
+  ];
+}
