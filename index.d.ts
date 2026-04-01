@@ -1,39 +1,106 @@
-export type SenseMode = "first" | "all";
+export type SenseMode = "first" | "all" | "detailed";
 
 export type RuleName =
-    | "repeatedChar"
-    | "placeholderWord"
-    | "minLength"
-    | "sequential"
-    | "reverseSequential"
-    | "keyboardPattern"
-    | "entropy"
-    | "symbolOnly"
-    | "numericOnly"
-    | "repeatedWord"
-    | "lowVowelRatio";
+  | "repeatedChar"
+  | "placeholderWord"
+  | "minLength"
+  | "sequential"
+  | "reverseSequential"
+  | "keyboardPattern"
+  | "entropy"
+  | "symbolOnly"
+  | "numericOnly"
+  | "repeatedWord"
+  | "lowVowelRatio";
+
+// Per-rule config interfaces
+export interface RepeatedCharRuleConfig {
+  threshold?: number;
+}
 
 export interface MinLengthRuleConfig {
-    minLength?: number;
+  minLength?: number;
 }
 
 export interface EntropyRuleConfig {
-    minLength?: number;
-    minRatio?: number;
+  minLength?: number;
+  minRatio?: number;
+}
+
+export interface KeyboardPatternRuleConfig {
+  minLength?: number;
+}
+
+export interface RepeatedWordRuleConfig {
+  maxAllowedRatio?: number;
+}
+
+export interface LowVowelRatioRuleConfig {
+  minLength?: number;
+  minRatio?: number;
+}
+
+export interface PlaceholderWordRuleConfig {
+  customWords?: string[];
 }
 
 export interface RuleConfigs {
-    minLength?: MinLengthRuleConfig;
-    entropy?: EntropyRuleConfig;
+  repeatedChar?: RepeatedCharRuleConfig;
+  placeholderWord?: PlaceholderWordRuleConfig;
+  minLength?: MinLengthRuleConfig;
+  keyboardPattern?: KeyboardPatternRuleConfig;
+  entropy?: EntropyRuleConfig;
+  repeatedWord?: RepeatedWordRuleConfig;
+  lowVowelRatio?: LowVowelRatioRuleConfig;
 }
 
 export interface SenseInputOptions {
-    mode?: SenseMode;
-    disable?: RuleName[];
-    rules?: RuleConfigs;
+  mode?: SenseMode;
+  disable?: RuleName[];
+  rules?: RuleConfigs;
 }
 
+// Structured result returned by mode: "detailed"
+export interface SenseIssue {
+  rule: RuleName;
+  message: string;
+}
+
+// senseInput return type varies by mode:
+// mode: "first" (default) → string | null
+// mode: "all"             → string[] | null
+// mode: "detailed"        → SenseIssue[] | null
 export function senseInput(
-    value: string,
-    options?: SenseInputOptions
-): string | string[] | null;
+  value: string,
+  options?: SenseInputOptions & { mode?: "first" }
+): string | null;
+
+export function senseInput(
+  value: string,
+  options: SenseInputOptions & { mode: "all" }
+): string[] | null;
+
+export function senseInput(
+  value: string,
+  options: SenseInputOptions & { mode: "detailed" }
+): SenseIssue[] | null;
+
+// senseInputBatch validates multiple fields at once
+// returns a map of field name → same return type as senseInput
+export function senseInputBatch(
+  fields: Record<string, string>,
+  options?: SenseInputOptions & { mode?: "first" }
+): Record<string, string | null>;
+
+export function senseInputBatch(
+  fields: Record<string, string>,
+  options: SenseInputOptions & { mode: "all" }
+): Record<string, string[] | null>;
+
+export function senseInputBatch(
+  fields: Record<string, string>,
+  options: SenseInputOptions & { mode: "detailed" }
+): Record<string, SenseIssue[] | null>;
+
+// listRules returns all available rule names in execution order
+export function listRules(): RuleName[];
