@@ -240,4 +240,22 @@ describe("senseInput", () => {
     const result = senseInput("aaaa", { mode: "all" });
     expect(result).toEqual(["Input looks like repeated characters"]);
   });
+
+  it("detects all caps input via senseInput", () => {
+    const result = senseInput("HELLO", { disable: ["minLength"] });
+    expect(result).toContain("uppercase");
+  });
+
+  it("skips allCaps rule when disabled", () => {
+    const result = senseInput("HARSHIT", { disable: ["allCaps", "minLength"] });
+    expect(result).toBe(null);
+  });
+
+  it("respects custom allCaps minLength config", () => {
+    const result = senseInput("AB", {
+      disable: ["minLength"],
+      rules: { allCaps: { minLength: 3 } }
+    });
+    expect(result).toBe(null);
+  });
 });
