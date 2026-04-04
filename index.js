@@ -9,6 +9,7 @@ import { symbolOnlyRule } from "./rules/symbolOnlyRule.js";
 import { numericOnlyRule } from "./rules/numericOnlyRule.js";
 import { repeatedWordRule } from "./rules/repeatedWordRule.js";
 import { vowelRatioRule } from "./rules/vowelRatioRule.js";
+import { allCapsRule } from "./rules/allCapsRule.js";
 
 export function senseInput(value, options = {}) {
   const mode = options.mode || "first";
@@ -27,7 +28,8 @@ export function senseInput(value, options = {}) {
     "symbolOnly",
     "numericOnly",
     "repeatedWord",
-    "lowVowelRatio"
+    "lowVowelRatio",
+    "allCaps"
   ];
 
   if (process.env.NODE_ENV !== "production") {
@@ -52,6 +54,13 @@ export function senseInput(value, options = {}) {
     const repeatedCharConfig = ruleConfigs.repeatedChar || {};
     const result = repeatedCharRule(value, repeatedCharConfig.threshold);
     if (handle("repeatedChar", result)) return mode === "detailed" ? { rule: "repeatedChar", message: result } : result;
+  }
+
+  // Rule: all caps input
+  if (!disabledRules.includes("allCaps")) {
+    const allCapsConfig = ruleConfigs.allCaps || {};
+    const result = allCapsRule(value, allCapsConfig.minLength);
+    if (handle("allCaps", result)) return mode === "detailed" ? { rule: "allCaps", message: result } : result;
   }
 
   // Rule: symbol only / whitespace
@@ -148,6 +157,7 @@ export function senseInputBatch(fields, options = {}) {
 export function listRules() {
   return [
     "repeatedChar",
+    "allCaps",
     "symbolOnly",
     "numericOnly",
     "placeholderWord",
