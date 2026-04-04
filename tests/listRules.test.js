@@ -6,14 +6,15 @@ describe("listRules", () => {
         expect(Array.isArray(listRules())).toBe(true);
     });
 
-    it("returns all 12 rules", () => {
-        expect(listRules().length).toBe(12);
+    it("returns all 13 rules", () => {
+        expect(listRules().length).toBe(13);
     });
 
     it("contains all expected rule names", () => {
         const rules = listRules();
         expect(rules).toContain("repeatedChar");
         expect(rules).toContain("allCaps");
+        expect(rules).toContain("unicodeOnly");
         expect(rules).toContain("symbolOnly");
         expect(rules).toContain("numericOnly");
         expect(rules).toContain("placeholderWord");

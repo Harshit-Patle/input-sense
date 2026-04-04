@@ -59,14 +59,15 @@ describe("senseInput", () => {
   });
 
   it("detects symbol-only input via senseInput", () => {
-    const result = senseInput("-----");
+    const result = senseInput("-----", { disable: ["unicodeOnly"] });
     expect(result).toContain("symbol");
   });
 
   it("skips symbolOnly rule when disabled", () => {
-    const result = senseInput("------", { disable: ["symbolOnly"] });
+    const result = senseInput("------", { disable: ["symbolOnly", "unicodeOnly"] });
     expect(result).toContain("diversity");
   });
+
 
   it("detects numeric-only input via senseInput", () => {
     const result = senseInput("123456");
@@ -176,7 +177,7 @@ describe("senseInput", () => {
   });
 
   it("returns symbolOnly issue in first mode", () => {
-    const result = senseInput("----");
+    const result = senseInput("----", { disable: ["unicodeOnly"] });
     expect(result).toContain("symbol");
   });
 
@@ -255,6 +256,24 @@ describe("senseInput", () => {
     const result = senseInput("AB", {
       disable: ["minLength"],
       rules: { allCaps: { minLength: 3 } }
+    });
+    expect(result).toBe(null);
+  });
+
+  it("detects unicode-only input via senseInput", () => {
+    const result = senseInput("🔥🔥🔥");
+    expect(result).toContain("standard characters");
+  });
+
+  it("skips unicodeOnly rule when disabled", () => {
+    const result = senseInput("🔥🔥🔥", { disable: ["unicodeOnly"] });
+    expect(result).not.toContain("standard characters");
+  });
+
+  it("respects custom unicodeOnly minLength config", () => {
+    const result = senseInput("🔥", {
+      disable: ["symbolOnly", "minLength"],
+      rules: { unicodeOnly: { minLength: 3 } }
     });
     expect(result).toBe(null);
   });
