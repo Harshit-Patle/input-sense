@@ -4,11 +4,12 @@
   "description": "Detects low-quality, fake, or placeholder user inputs beyond regex validation",
   "type": "module",
   "types": "index.d.ts",
-  "main": "index.js",
+  "main": "dist/index.cjs",
   "exports": {
     ".": {
-      "import": "./index.js",
-      "types": "./index.d.ts"
+      "types": "./index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./index.js"
     }
   },
   "engines": {
@@ -39,17 +40,20 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "rules"
+    "rules",
+    "dist"
   ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@vitest/coverage-istanbul": "^4.0.18",
+    "esbuild": "^0.28.0",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
     "vitest": "^4.0.18"
   },
   "scripts": {
+    "build": "node build.js",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
