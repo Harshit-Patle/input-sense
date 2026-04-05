@@ -48,7 +48,7 @@ describe("senseInput", () => {
   });
 
   it("uses default rule values when no config is provided", () => {
-    const result = senseInput("abc", { disable: ["placeholderWord"] });
+    const result = senseInput("abc", { disable: ["placeholderWord", "leetSpeak"] });
     expect(result).toContain("too short");
   });
 
@@ -200,7 +200,7 @@ describe("senseInput", () => {
   it("covers symbolOnly falsy branch in all mode", () => {
     const result = senseInput("hello", {
       mode: "all",
-      disable: ["repeatedChar", "placeholderWord", "repeatedWord", "minLength", "sequential", "reverseSequential", "keyboardPattern", "entropy", "lowVowelRatio", "numericOnly"]
+      disable: ["repeatedChar", "placeholderWord", "leetSpeak", "repeatedWord", "minLength", "sequential", "reverseSequential", "keyboardPattern", "entropy", "lowVowelRatio", "numericOnly", "allCaps", "unicodeOnly"]
     });
     expect(result).toBe(null);
   });
@@ -276,5 +276,22 @@ describe("senseInput", () => {
       rules: { unicodeOnly: { minLength: 3 } }
     });
     expect(result).toBe(null);
+  });
+
+  it("detects leet speak input via senseInput", () => {
+    const result = senseInput("4dmin", { disable: ["minLength"] });
+    expect(result).toContain("leet");
+  });
+
+  it("skips leetSpeak rule when disabled", () => {
+    const result = senseInput("4dmin", { disable: ["leetSpeak", "minLength"] });
+    expect(result).toBe(null);
+  });
+
+  it("respects custom leetSpeak customWords config", () => {
+    const result = senseInput("mycust0mw0rd", {
+      rules: { leetSpeak: { customWords: ["mycustomword"] } }
+    });
+    expect(result).toContain("leet");
   });
 });

@@ -6,8 +6,8 @@ describe("listRules", () => {
         expect(Array.isArray(listRules())).toBe(true);
     });
 
-    it("returns all 13 rules", () => {
-        expect(listRules().length).toBe(13);
+    it("returns all 14 rules", () => {
+        expect(listRules().length).toBe(14);
     });
 
     it("contains all expected rule names", () => {
@@ -18,6 +18,7 @@ describe("listRules", () => {
         expect(rules).toContain("symbolOnly");
         expect(rules).toContain("numericOnly");
         expect(rules).toContain("placeholderWord");
+        expect(rules).toContain("leetSpeak");
         expect(rules).toContain("repeatedWord");
         expect(rules).toContain("minLength");
         expect(rules).toContain("sequential");
