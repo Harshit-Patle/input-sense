@@ -11,6 +11,7 @@ import { repeatedWordRule } from "./rules/repeatedWordRule.js";
 import { vowelRatioRule } from "./rules/vowelRatioRule.js";
 import { allCapsRule } from "./rules/allCapsRule.js";
 import { unicodeOnlyRule } from "./rules/unicodeOnlyRule.js";
+import { leetSpeakRule } from "./rules/leetSpeakRule.js";
 
 export function senseInput(value, options = {}) {
   const mode = options.mode || "first";
@@ -31,7 +32,8 @@ export function senseInput(value, options = {}) {
     "repeatedWord",
     "lowVowelRatio",
     "allCaps",
-    "unicodeOnly"
+    "unicodeOnly",
+    "leetSpeak"
   ];
 
   if (process.env.NODE_ENV !== "production") {
@@ -89,6 +91,13 @@ export function senseInput(value, options = {}) {
     const placeholderConfig = ruleConfigs.placeholderWord || {};
     const result = placeholderWordRule(value, placeholderConfig.customWords);
     if (handle("placeholderWord", result)) return mode === "detailed" ? { rule: "placeholderWord", message: result } : result;
+  }
+
+  // Rule: leet speak placeholder detection
+  if (!disabledRules.includes("leetSpeak")) {
+    const leetSpeakConfig = ruleConfigs.leetSpeak || {};
+    const result = leetSpeakRule(value, leetSpeakConfig.customWords);
+    if (handle("leetSpeak", result)) return mode === "detailed" ? { rule: "leetSpeak", message: result } : result;
   }
 
   // Rule: repeated words
@@ -171,6 +180,7 @@ export function listRules() {
     "symbolOnly",
     "numericOnly",
     "placeholderWord",
+    "leetSpeak",
     "repeatedWord",
     "minLength",
     "sequential",
