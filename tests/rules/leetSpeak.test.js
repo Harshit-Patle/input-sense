@@ -39,4 +39,8 @@ describe("leetSpeakRule", () => {
         expect(leetSpeakRule("")).toBe(null);
         expect(leetSpeakRule(null)).toBe(null);
     });
+    
+    it("returns null for whitespace-only input", () => {
+        expect(leetSpeakRule("   ")).toBe(null);
+    });
 });

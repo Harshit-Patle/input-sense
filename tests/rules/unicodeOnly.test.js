@@ -43,4 +43,8 @@ describe("unicodeOnlyRule", () => {
     it("returns null for whitespace-only input with custom minLength", () => {
         expect(unicodeOnlyRule("   ", 1)).toBe(null);
     });
+
+    it("returns null for whitespace input that passes minLength", () => {
+        expect(unicodeOnlyRule("     ", 3)).toBe(null);
+    });
 });
