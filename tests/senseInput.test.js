@@ -328,4 +328,31 @@ describe("senseInput", () => {
     expect(senseInput("aaaa")).toBe("Input looks like repeated characters");
     expect(senseInput("aaaa", { mode: "all" })).toEqual(["Input looks like repeated characters"]);
   });
+
+  it("runs minLength before repeatedChar when priority is set", () => {
+  const result = senseInput("aaaa", {
+    priority: ["minLength", "repeatedChar"],
+    disable: ["placeholderWord", "leetSpeak", "allCaps", "unicodeOnly",
+              "symbolOnly", "numericOnly", "repeatedWord"],
+    rules: { minLength: { minLength: 5 } }
+  });
+  expect(result).toContain("too short");
+});
+
+  it("ignores unknown rule names in priority safely", () => {
+    const result = senseInput("aaaa", { priority: ["notARealRule"] });
+    expect(result).toBeTruthy();
+  });
+
+  it("works with priority in mode all", () => {
+    const result = senseInput("aaaa", {
+      mode: "all",
+      priority: ["minLength", "repeatedChar"],
+      disable: ["placeholderWord", "leetSpeak", "allCaps", "unicodeOnly",
+        "symbolOnly", "numericOnly", "repeatedWord"],
+      rules: { minLength: { minLength: 5 } }
+    });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result[0]).toContain("too short");
+  });
 });
