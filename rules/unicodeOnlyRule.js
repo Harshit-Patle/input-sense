@@ -3,7 +3,6 @@ export function unicodeOnlyRule(value, minLength = 1) {
 
     const normalized = value.trim();
     if (normalized.length < minLength) return null;
-    if (normalized.length === 0) return null;
 
     const hasLatinOrDigit = /[a-zA-Z0-9]/.test(normalized);
 
