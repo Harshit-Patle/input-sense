@@ -3,6 +3,18 @@
 > ℹ️ Note: Versions prior to 0.4.0 were early experimental releases.
 > This changelog tracks stable, user-facing changes from 0.4.0 onward.
 
+## 0.12.0
+
+- Added CJS dual build — package now ships both ESM and CommonJS via `dist/index.cjs`
+- Added `allCaps` rule to detect fully uppercase inputs
+- Added `unicodeOnly` rule to detect inputs with no standard Latin or digit characters
+- Added `leetSpeak` rule to detect leet speak variants of placeholder words (e.g. `4dmin`, `t3st`)
+- Added `mode: "score"` to return a 0–100 input quality score
+- Added `priority` option to control rule execution order
+- Updated TypeScript typings for all new rules, score mode, and priority option
+- Expanded test suite from 112 to 157 tests
+- No breaking changes
+
 ## 0.11.0
 
 - Added `exports` field to `package.json` for proper ESM and TypeScript resolution

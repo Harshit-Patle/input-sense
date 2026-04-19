@@ -39,12 +39,18 @@ input-sense helps detect such inputs early and improve overall data quality.
 - Detects sequential patterns
 - Detects reverse sequences
 - Identifies keyboard patterns
+- Detects all-caps inputs
+- Detects unicode/emoji-only inputs
+- Detects leet speak placeholder variants (e.g. `4dmin`, `t3st`)
 - Supports returning all detected issues (`mode: "all"`)
 - Supports structured output with rule names (`mode: "detailed"`)
+- Supports quality scoring (`mode: "score"`)
 - Allows enabling/disabling specific rules
+- Supports custom rule execution order via `priority` option
 - Supports per-rule configuration for fine-grained tuning
 - Batch validation for multiple form fields (`senseInputBatch`)
 - Runtime rule discovery (`listRules`)
+- Ships as both ESM and CommonJS
 - Lightweight and dependency-free
 - Frontend-friendly
 - Full TypeScript support with per-mode return type inference
@@ -92,6 +98,12 @@ if (result) {
 }
 ```
 
+CommonJS is also supported:
+
+```js
+const { senseInput } = require("input-sense");
+```
+
 ---
 
 ## Advanced Usage
@@ -115,6 +127,23 @@ senseInput("aaaa", { mode: "detailed" });
 // [{ rule: "repeatedChar", message: "Input looks like repeated characters" }]
 ```
 
+### Get a quality score
+
+Use `mode: "score"` to get a 0–100 quality score instead of pass/fail.
+100 means fully clean, 0 means completely unusable.
+This is useful for analytics, soft warnings, and live quality indicators.
+
+```js
+senseInput("Harshit", { mode: "score" });
+// 100
+
+senseInput("aaaa", { mode: "score" });
+// 0
+
+senseInput("HELLO", { mode: "score" });
+// 70
+```
+
 ### Validate multiple fields at once
 
 Use `senseInputBatch` to validate an entire form object in one call.
@@ -134,8 +163,22 @@ senseInputBatch({
 Works with all modes:
 
 ```js
-senseInputBatch({ username: "aaaa" }, { mode: "detailed" });
-// { username: [{ rule: "repeatedChar", message: "Input looks like repeated characters" }] }
+senseInputBatch({ username: "aaaa" }, { mode: "score" });
+// { username: 0 }
+```
+
+### Control rule execution order
+
+Use the `priority` option to run specific rules first.
+Rules not mentioned in `priority` run after in their default order.
+
+```js
+senseInput("aaaa", {
+  priority: ["minLength", "repeatedChar"],
+  rules: { minLength: { minLength: 5 } }
+});
+// "Input is too short to be meaningful (minimum 5 characters)"
+// minLength fires first even though repeatedChar would normally run earlier
 ```
 
 ### Discover available rules at runtime
@@ -146,11 +189,10 @@ Use `listRules` to get all available rule names in execution order.
 import { listRules } from "input-sense";
 
 listRules();
-// ["repeatedChar", "symbolOnly", "numericOnly", "placeholderWord", "repeatedWord",
-//  "minLength", "sequential", "reverseSequential", "keyboardPattern", "entropy", "lowVowelRatio"]
+// ["repeatedChar", "allCaps", "unicodeOnly", "symbolOnly", "numericOnly",
+//  "placeholderWord", "leetSpeak", "repeatedWord", "minLength", "sequential",
+//  "reverseSequential", "keyboardPattern", "entropy", "lowVowelRatio"]
 ```
-
-This is useful for validating your `disable` array before passing it to `senseInput`.
 
 ### Disable specific rules
 
@@ -169,20 +211,43 @@ You can fine-tune rules using the `rules` option.
 
 ```js
 senseInput("aaa", {
-  rules: {
-    repeatedChar: { threshold: 4 }
-  }
+  rules: { repeatedChar: { threshold: 4 } }
 });
-// null — only flags when 5+ repetitions (threshold + 1)
+// null — only flags when 5+ repetitions
+```
+
+#### allCaps — custom minimum length
+
+```js
+senseInput("OK", {
+  rules: { allCaps: { minLength: 2 } }
+});
+// "Input contains only uppercase letters and looks non-meaningful"
+```
+
+#### unicodeOnly — custom minimum length
+
+```js
+senseInput("🔥", {
+  rules: { unicodeOnly: { minLength: 3 } }
+});
+// null — input is too short to check
+```
+
+#### leetSpeak — add custom words
+
+```js
+senseInput("mycust0mw0rd", {
+  rules: { leetSpeak: { customWords: ["mycustomword"] } }
+});
+// "Input looks like a leet speak placeholder word"
 ```
 
 #### placeholderWord — add custom words
 
 ```js
 senseInput("mycustomword", {
-  rules: {
-    placeholderWord: { customWords: ["mycustomword"] }
-  }
+  rules: { placeholderWord: { customWords: ["mycustomword"] } }
 });
 // "Input looks like a placeholder word"
 ```
@@ -191,9 +256,7 @@ senseInput("mycustomword", {
 
 ```js
 senseInput("qw", {
-  rules: {
-    keyboardPattern: { minLength: 5 }
-  }
+  rules: { keyboardPattern: { minLength: 5 } }
 });
 // null — input is too short to check
 ```
@@ -202,9 +265,7 @@ senseInput("qw", {
 
 ```js
 senseInput("hey hey there", {
-  rules: {
-    repeatedWord: { maxAllowedRatio: 0.6 }
-  }
+  rules: { repeatedWord: { maxAllowedRatio: 0.6 } }
 });
 // null — duplication ratio is within the allowed limit
 ```
@@ -213,9 +274,7 @@ senseInput("hey hey there", {
 
 ```js
 senseInput("bcdfgh", {
-  rules: {
-    lowVowelRatio: { minRatio: 0.1 }
-  }
+  rules: { lowVowelRatio: { minRatio: 0.1 } }
 });
 // null — ratio threshold is relaxed
 ```
@@ -224,9 +283,7 @@ senseInput("bcdfgh", {
 
 ```js
 senseInput("hello", {
-  rules: {
-    minLength: { minLength: 6 }
-  }
+  rules: { minLength: { minLength: 6 } }
 });
 // "Input is too short to be meaningful (minimum 6 characters)"
 ```
@@ -235,21 +292,7 @@ senseInput("hello", {
 
 ```js
 senseInput("abcdef", {
-  rules: {
-    entropy: { minLength: 6, minRatio: 0.9 }
-  }
-});
-```
-
-#### Combine multiple rule configurations
-
-```js
-senseInput("aa", {
-  mode: "all",
-  rules: {
-    minLength: { minLength: 5 },
-    entropy: { minLength: 6, minRatio: 0.6 }
-  }
+  rules: { entropy: { minLength: 6, minRatio: 0.9 } }
 });
 ```
 
@@ -260,6 +303,7 @@ senseInput("aa", {
 | `"first"` (default) | `string \| null` | You only need the first blocking issue |
 | `"all"` | `string[] \| null` | You want to show all issues at once |
 | `"detailed"` | `{ rule, message }[] \| null` | You need to know which rule fired |
+| `"score"` | `number` | You want a 0–100 quality score |
 
 ---
 
@@ -268,7 +312,10 @@ senseInput("aa", {
 | Rule | Config option | Type | Default | Description |
 |------|--------------|------|---------|-------------|
 | `repeatedChar` | `threshold` | `number` | `0` | Min repetitions before flagging |
+| `allCaps` | `minLength` | `number` | `4` | Min length before checking |
+| `unicodeOnly` | `minLength` | `number` | `1` | Min length before checking |
 | `placeholderWord` | `customWords` | `string[]` | `[]` | Extra words to flag |
+| `leetSpeak` | `customWords` | `string[]` | `[]` | Extra decoded words to flag |
 | `keyboardPattern` | `minLength` | `number` | `3` | Min length before checking |
 | `repeatedWord` | `maxAllowedRatio` | `number` | `0` | Max allowed duplication ratio |
 | `lowVowelRatio` | `minLength` | `number` | `5` | Min length before checking |
@@ -286,6 +333,15 @@ All rules have safe defaults. Unknown rule names in `rules` config are safely ig
 ```js
 senseInput("aaaa");
 // "Input looks like repeated characters"
+
+senseInput("HELLO");
+// "Input contains only uppercase letters and looks non-meaningful"
+
+senseInput("🔥🔥🔥");
+// "Input contains no standard characters and looks non-meaningful"
+
+senseInput("4dmin");
+// "Input looks like a leet speak placeholder word"
 
 senseInput("test");
 // "Input looks like a placeholder word"
@@ -318,7 +374,7 @@ senseInput("Harshit");
 
 This project uses automated test coverage to ensure reliability.
 Coverage is collected and reported on every commit via CI.
-All 11 rule files maintain 100% coverage across statements, branches, functions, and lines.
+All 14 rule files maintain 100% coverage across statements, branches, functions, and lines.
 
 ---
 
@@ -331,9 +387,9 @@ It runs a series of small, focused rules to answer one question:
 > "Does this input look meaningful for a human?"
 
 - Each rule checks a specific pattern
-- Rules run in a fixed order
+- Rules run in a configurable order
 - By default, the first issue is returned
-- You can opt into collecting all issues or structured output
+- You can opt into collecting all issues, structured output, or a quality score
 
 ---
 
@@ -398,9 +454,11 @@ All core validation rules are covered by automated tests and enforced via CI.
 | Simple forms | Default mode |
 | Rich UX | `mode: "all"` |
 | Rule-specific UX | `mode: "detailed"` |
+| Live quality indicator | `mode: "score"` |
 | Full form validation | `senseInputBatch` |
+| Custom rule order | `priority` option |
 | Strict apps | Enable entropy tuning |
-| JS projects | Rely on runtime behavior |
+| JS projects | ESM or CommonJS |
 | TS projects | Enjoy full type safety |
 
 ---
