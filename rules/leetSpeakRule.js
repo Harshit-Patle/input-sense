@@ -13,7 +13,6 @@ const LEET_MAP = {
     "6": "g",
     "8": "b",
     "|": "l",
-    "1": "l",
 };
 
 export function leetSpeakRule(value, customWords = []) {
