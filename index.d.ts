@@ -1,4 +1,4 @@
-export type SenseMode = "first" | "all" | "detailed";
+export type SenseMode = "first" | "all" | "detailed" | "score";
 
 export type RuleName =
   | "repeatedChar"
@@ -85,6 +85,11 @@ export function senseInput(
   options: SenseInputOptions & { mode: "detailed" }
 ): SenseIssue[] | null;
 
+export function senseInput(
+  value: string,
+  options: SenseInputOptions & { mode: "score" }
+): number;
+
 // senseInputBatch validates multiple fields at once
 // returns a map of field name → same return type as senseInput
 export function senseInputBatch(
@@ -101,6 +106,11 @@ export function senseInputBatch(
   fields: Record<string, string>,
   options: SenseInputOptions & { mode: "detailed" }
 ): Record<string, SenseIssue[] | null>;
+
+export function senseInputBatch(
+  fields: Record<string, string>,
+  options: SenseInputOptions & { mode: "score" }
+): Record<string, number>;
 
 // listRules returns all available rule names in execution order
 export function listRules(): RuleName[];

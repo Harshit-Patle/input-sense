@@ -19,6 +19,23 @@ export function senseInput(value, options = {}) {
   const disabledRules = options.disable || [];
   const ruleConfigs = options.rules || {};
 
+  const RULE_WEIGHTS = {
+    repeatedChar: 100,
+    allCaps: 30,
+    unicodeOnly: 100,
+    symbolOnly: 100,
+    numericOnly: 60,
+    placeholderWord: 80,
+    leetSpeak: 80,
+    repeatedWord: 50,
+    minLength: 40,
+    sequential: 70,
+    reverseSequential: 70,
+    keyboardPattern: 90,
+    entropy: 50,
+    lowVowelRatio: 40,
+  };
+
   const KNOWN_RULES = [
     "repeatedChar",
     "placeholderWord",
@@ -46,7 +63,7 @@ export function senseInput(value, options = {}) {
 
   function handle(ruleName, message) {
     if (!message) return false;
-    if (mode === "all" || mode === "detailed") {
+    if (mode === "all" || mode === "detailed" || mode === "score") {
       issues.push({ rule: ruleName, message });
       return false;
     }
@@ -153,6 +170,14 @@ export function senseInput(value, options = {}) {
 
   if (mode === "detailed") {
     return issues.length > 0 ? issues : null;
+  }
+
+  if (mode === "score") {
+    if (issues.length === 0) return 100;
+    const totalDeduction = issues.reduce((sum, issue) => {
+      return sum + (RULE_WEIGHTS[issue.rule] || 50);
+    }, 0);
+    return Math.max(0, 100 - totalDeduction);
   }
 
   return null;
