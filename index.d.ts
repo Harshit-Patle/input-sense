@@ -58,6 +58,7 @@ export interface SenseInputOptions {
   mode?: SenseMode;
   disable?: RuleName[];
   rules?: RuleConfigs;
+  priority?: RuleName[];
 }
 
 // Structured result returned by mode: "detailed"
