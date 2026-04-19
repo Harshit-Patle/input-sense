@@ -11,7 +11,10 @@ export type RuleName =
   | "symbolOnly"
   | "numericOnly"
   | "repeatedWord"
-  | "lowVowelRatio";
+  | "lowVowelRatio"
+  | "allCaps"
+  | "unicodeOnly"
+  | "leetSpeak";
 
 // Per-rule config interfaces
 export interface RepeatedCharRuleConfig {
@@ -44,6 +47,18 @@ export interface PlaceholderWordRuleConfig {
   customWords?: string[];
 }
 
+export interface AllCapsRuleConfig {
+  minLength?: number;
+}
+
+export interface UnicodeOnlyRuleConfig {
+  minLength?: number;
+}
+
+export interface LeetSpeakRuleConfig {
+  customWords?: string[];
+}
+
 export interface RuleConfigs {
   repeatedChar?: RepeatedCharRuleConfig;
   placeholderWord?: PlaceholderWordRuleConfig;
@@ -52,6 +67,9 @@ export interface RuleConfigs {
   entropy?: EntropyRuleConfig;
   repeatedWord?: RepeatedWordRuleConfig;
   lowVowelRatio?: LowVowelRatioRuleConfig;
+  allCaps?: AllCapsRuleConfig;
+  unicodeOnly?: UnicodeOnlyRuleConfig;
+  leetSpeak?: LeetSpeakRuleConfig;
 }
 
 export interface SenseInputOptions {
@@ -71,6 +89,7 @@ export interface SenseIssue {
 // mode: "first" (default) → string | null
 // mode: "all"             → string[] | null
 // mode: "detailed"        → SenseIssue[] | null
+// mode: "score"           → number
 export function senseInput(
   value: string,
   options?: SenseInputOptions & { mode?: "first" }
