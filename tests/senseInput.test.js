@@ -294,4 +294,38 @@ describe("senseInput", () => {
     });
     expect(result).toContain("leet");
   });
+
+  it("returns 100 for valid input in score mode", () => {
+    const result = senseInput("Harshit", { mode: "score" });
+    expect(result).toBe(100);
+  });
+
+  it("returns 0 for repeated char input in score mode", () => {
+    const result = senseInput("aaaa", { mode: "score" });
+    expect(result).toBe(0);
+  });
+
+  it("returns a number between 0 and 100 in score mode", () => {
+    const result = senseInput("HARSHIT", {
+      mode: "score",
+      disable: ["minLength"]
+    });
+    expect(typeof result).toBe("number");
+    expect(result).toBeGreaterThanOrEqual(0);
+    expect(result).toBeLessThanOrEqual(100);
+  });
+
+  it("returns lower score for worse input in score mode", () => {
+    const good = senseInput("Harshit", { mode: "score" });
+    const bad = senseInput("qwerty", {
+      mode: "score",
+      disable: ["minLength", "placeholderWord", "leetSpeak"]
+    });
+    expect(bad).toBeLessThan(good);
+  });
+
+  it("does not break existing modes after score mode added", () => {
+    expect(senseInput("aaaa")).toBe("Input looks like repeated characters");
+    expect(senseInput("aaaa", { mode: "all" })).toEqual(["Input looks like repeated characters"]);
+  });
 });
