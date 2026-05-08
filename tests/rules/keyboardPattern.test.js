@@ -31,4 +31,9 @@ describe("keyboardPatternRule",()=>{
         expect(keyboardPatternRule("")).toBe(null);
         expect(keyboardPatternRule(null)).toBe(null);
     });
+    
+    it("detects keyboard pattern in segmented input", () => {
+        expect(keyboardPatternRule("qwerty@gmail.com")).toBeTruthy();
+        expect(keyboardPatternRule("user-asdf-123")).toBeTruthy();
+    });
 });
