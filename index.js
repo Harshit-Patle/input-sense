@@ -12,13 +12,27 @@ import { vowelRatioRule } from "./rules/vowelRatioRule.js";
 import { allCapsRule } from "./rules/allCapsRule.js";
 import { unicodeOnlyRule } from "./rules/unicodeOnlyRule.js";
 import { leetSpeakRule } from "./rules/leetSpeakRule.js";
+import { validEmailFormatRule } from "./rules/validEmailFormatRule.js";
+import { emailPreset } from "./presets/email.js";
 
 export function senseInput(value, options = {}) {
   const mode = options.mode || "first";
   const issues = [];
-  const disabledRules = options.disable || [];
-  const ruleConfigs = options.rules || {};
   const priority = options.priority || [];
+
+  const TYPE_PRESETS = {
+    email: emailPreset,
+  };
+
+  const preset = options.type ? (TYPE_PRESETS[options.type] || {}) : {};
+  const presetEnable = preset.enable || [];
+  const DEFAULT_DISABLED = ["validEmailFormat"];
+  const mergedDisable = [
+    ...DEFAULT_DISABLED.filter(r => !presetEnable.includes(r)),
+    ...(preset.disable || []),
+    ...(options.disable || [])
+  ];
+  const mergedRules = { ...(preset.rules || {}), ...(options.rules || {}) };
 
   const RULE_WEIGHTS = {
     repeatedChar: 100,
@@ -35,6 +49,7 @@ export function senseInput(value, options = {}) {
     keyboardPattern: 90,
     entropy: 50,
     lowVowelRatio: 40,
+    validEmailFormat: 100,
   };
 
   const KNOWN_RULES = [
@@ -51,11 +66,12 @@ export function senseInput(value, options = {}) {
     "lowVowelRatio",
     "allCaps",
     "unicodeOnly",
-    "leetSpeak"
+    "leetSpeak",
+    "validEmailFormat"
   ];
 
   if (process.env.NODE_ENV !== "production") {
-    disabledRules.forEach((rule) => {
+    mergedDisable.forEach((rule) => {
       if (!KNOWN_RULES.includes(rule)) {
         console.warn(`[input-sense] Unknown rule "${rule}"`);
       }
@@ -74,15 +90,15 @@ export function senseInput(value, options = {}) {
   const ALL_RULES = [
     {
       name: "repeatedChar",
-      run: () => repeatedCharRule(value, (ruleConfigs.repeatedChar || {}).threshold),
+      run: () => repeatedCharRule(value, (mergedRules.repeatedChar || {}).threshold),
     },
     {
       name: "allCaps",
-      run: () => allCapsRule(value, (ruleConfigs.allCaps || {}).minLength),
+      run: () => allCapsRule(value, (mergedRules.allCaps || {}).minLength),
     },
     {
       name: "unicodeOnly",
-      run: () => unicodeOnlyRule(value, (ruleConfigs.unicodeOnly || {}).minLength),
+      run: () => unicodeOnlyRule(value, (mergedRules.unicodeOnly || {}).minLength),
     },
     {
       name: "symbolOnly",
@@ -94,19 +110,19 @@ export function senseInput(value, options = {}) {
     },
     {
       name: "placeholderWord",
-      run: () => placeholderWordRule(value, (ruleConfigs.placeholderWord || {}).customWords),
+      run: () => placeholderWordRule(value, (mergedRules.placeholderWord || {}).customWords),
     },
     {
       name: "leetSpeak",
-      run: () => leetSpeakRule(value, (ruleConfigs.leetSpeak || {}).customWords),
+      run: () => leetSpeakRule(value, (mergedRules.leetSpeak || {}).customWords),
     },
     {
       name: "repeatedWord",
-      run: () => repeatedWordRule(value, (ruleConfigs.repeatedWord || {}).maxAllowedRatio),
+      run: () => repeatedWordRule(value, (mergedRules.repeatedWord || {}).maxAllowedRatio),
     },
     {
       name: "minLength",
-      run: () => minLengthRule(value, (ruleConfigs.minLength || {}).minLength),
+      run: () => minLengthRule(value, (mergedRules.minLength || {}).minLength),
     },
     {
       name: "sequential",
@@ -118,15 +134,23 @@ export function senseInput(value, options = {}) {
     },
     {
       name: "keyboardPattern",
-      run: () => keyboardPatternRule(value, (ruleConfigs.keyboardPattern || {}).minLength),
+      run: () => keyboardPatternRule(value, (mergedRules.keyboardPattern || {}).minLength),
     },
     {
       name: "entropy",
-      run: () => entropyRule(value, (ruleConfigs.entropy || {}).minLength, (ruleConfigs.entropy || {}).minRatio),
+      run: () => entropyRule(value, (mergedRules.entropy || {}).minLength, (mergedRules.entropy || {}).minRatio),
     },
     {
       name: "lowVowelRatio",
-      run: () => vowelRatioRule(value, (ruleConfigs.lowVowelRatio || {}).minLength, (ruleConfigs.lowVowelRatio || {}).minRatio),
+      run: () => vowelRatioRule(value, (mergedRules.lowVowelRatio || {}).minLength, (mergedRules.lowVowelRatio || {}).minRatio),
+    },
+    {
+      name: "validEmailFormat",
+      run: () => validEmailFormatRule(
+        value,
+        (mergedRules.validEmailFormat || {}).blockedDomains,
+        (mergedRules.validEmailFormat || {}).allowedDomains
+      ),
     },
   ];
 
@@ -139,7 +163,7 @@ export function senseInput(value, options = {}) {
   ];
 
   for (const rule of orderedRules) {
-    if (disabledRules.includes(rule.name)) continue;
+    if (mergedDisable.includes(rule.name)) continue;
     const result = rule.run();
     if (handle(rule.name, result)) {
       return mode === "detailed" ? { rule: rule.name, message: result } : result;
@@ -194,6 +218,7 @@ export function listRules() {
     "reverseSequential",
     "keyboardPattern",
     "entropy",
-    "lowVowelRatio"
+    "lowVowelRatio",
+    "validEmailFormat"
   ];
 }
