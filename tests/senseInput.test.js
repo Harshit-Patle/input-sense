@@ -68,7 +68,6 @@ describe("senseInput", () => {
     expect(result).toContain("diversity");
   });
 
-
   it("detects numeric-only input via senseInput", () => {
     const result = senseInput("123456");
     expect(result).toContain("numbers");
@@ -131,7 +130,6 @@ describe("senseInput", () => {
     expect(result).toBe(null);
   });
 
-  // mode: "all" branch coverage
   it("returns all issues including keyboardPattern in all mode", () => {
     const result = senseInput("qwerty", { mode: "all", disable: ["minLength", "entropy"] });
     expect(Array.isArray(result)).toBe(true);
@@ -181,7 +179,6 @@ describe("senseInput", () => {
     expect(result).toContain("symbol");
   });
 
-  // warn branch coverage
   it("warns about unknown rule only in non-production", () => {
     const original = process.env.NODE_ENV;
     process.env.NODE_ENV = "development";
@@ -330,14 +327,14 @@ describe("senseInput", () => {
   });
 
   it("runs minLength before repeatedChar when priority is set", () => {
-  const result = senseInput("aaaa", {
-    priority: ["minLength", "repeatedChar"],
-    disable: ["placeholderWord", "leetSpeak", "allCaps", "unicodeOnly",
-              "symbolOnly", "numericOnly", "repeatedWord"],
-    rules: { minLength: { minLength: 5 } }
+    const result = senseInput("aaaa", {
+      priority: ["minLength", "repeatedChar"],
+      disable: ["placeholderWord", "leetSpeak", "allCaps", "unicodeOnly",
+        "symbolOnly", "numericOnly", "repeatedWord"],
+      rules: { minLength: { minLength: 5 } }
+    });
+    expect(result).toContain("too short");
   });
-  expect(result).toContain("too short");
-});
 
   it("ignores unknown rule names in priority safely", () => {
     const result = senseInput("aaaa", { priority: ["notARealRule"] });
@@ -354,5 +351,42 @@ describe("senseInput", () => {
     });
     expect(Array.isArray(result)).toBe(true);
     expect(result[0]).toContain("too short");
+  });
+
+  // email type preset tests
+  it("detects invalid email format via type email", () => {
+    const result = senseInput("notanemail", { type: "email" });
+    expect(result).toContain("valid email");
+  });
+
+  it("detects disposable email domain via type email", () => {
+    const result = senseInput("user@mailinator.com", { type: "email" });
+    expect(result).toContain("disposable");
+  });
+  
+  it("detects keyboard pattern in email via type email", () => {
+    const result = senseInput("qwerty@gmail.com", { type: "email" });
+    expect(result).toContain("keyboard");
+  });
+
+  it("returns null for valid email via type email", () => {
+    const result = senseInput("harshit@gmail.com", { type: "email" });
+    expect(result).toBe(null);
+  });
+
+  it("respects allowedDomains config via type email", () => {
+    const result = senseInput("user@gmail.com", {
+      type: "email",
+      rules: { validEmailFormat: { allowedDomains: ["company.com"] } }
+    });
+    expect(result).toContain("not accepted");
+  });
+
+  it("respects custom blockedDomains config via type email", () => {
+    const result = senseInput("user@competitor.com", {
+      type: "email",
+      rules: { validEmailFormat: { blockedDomains: ["competitor.com"] } }
+    });
+    expect(result).toContain("disposable");
   });
 });
