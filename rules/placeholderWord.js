@@ -12,5 +12,14 @@ export function placeholderWordRule(value, customWords = []) {
     return "Input looks like a placeholder word";
   }
 
+  const parts = normalized.split(/\s+/);
+  if (parts.length > 1) {
+    for (const part of parts) {
+      if (allWords.includes(part)) {
+        return "Input looks like a placeholder word";
+      }
+    }
+  }
+
   return null;
 }
