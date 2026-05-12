@@ -14,6 +14,8 @@ import { unicodeOnlyRule } from "./rules/unicodeOnlyRule.js";
 import { leetSpeakRule } from "./rules/leetSpeakRule.js";
 import { validEmailFormatRule } from "./rules/validEmailFormatRule.js";
 import { emailPreset } from "./presets/email.js";
+import { spaceRequiredRule } from "./rules/spaceRequiredRule.js";
+import { fullNamePreset } from "./presets/fullName.js";
 
 export function senseInput(value, options = {}) {
   const mode = options.mode || "first";
@@ -22,11 +24,12 @@ export function senseInput(value, options = {}) {
 
   const TYPE_PRESETS = {
     email: emailPreset,
+    fullName: fullNamePreset,
   };
 
   const preset = options.type ? (TYPE_PRESETS[options.type] || {}) : {};
   const presetEnable = preset.enable || [];
-  const DEFAULT_DISABLED = ["validEmailFormat"];
+  const DEFAULT_DISABLED = ["validEmailFormat", "spaceRequired"];
   const mergedDisable = [
     ...DEFAULT_DISABLED.filter(r => !presetEnable.includes(r)),
     ...(preset.disable || []),
@@ -50,6 +53,7 @@ export function senseInput(value, options = {}) {
     entropy: 50,
     lowVowelRatio: 40,
     validEmailFormat: 100,
+    spaceRequired: 100,
   };
 
   const KNOWN_RULES = [
@@ -67,7 +71,8 @@ export function senseInput(value, options = {}) {
     "allCaps",
     "unicodeOnly",
     "leetSpeak",
-    "validEmailFormat"
+    "validEmailFormat",
+    "spaceRequired"
   ];
 
   if (process.env.NODE_ENV !== "production") {
@@ -88,6 +93,10 @@ export function senseInput(value, options = {}) {
   }
 
   const ALL_RULES = [
+    {
+      name: "spaceRequired",
+      run: () => spaceRequiredRule(value),
+    },
     {
       name: "repeatedChar",
       run: () => repeatedCharRule(value, (mergedRules.repeatedChar || {}).threshold),
@@ -205,6 +214,7 @@ export function senseInputBatch(fields, options = {}) {
 
 export function listRules() {
   return [
+    "spaceRequired",
     "repeatedChar",
     "allCaps",
     "unicodeOnly",
