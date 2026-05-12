@@ -79,7 +79,7 @@ describe("senseInput", () => {
   });
 
   it("detects repeated words via senseInput", () => {
-    const result = senseInput("test test test");
+    const result = senseInput("john john john");
     expect(result).toContain("repeated words");
   });
 
@@ -102,7 +102,7 @@ describe("senseInput", () => {
   });
 
   it("respects custom repeatedWord maxAllowedRatio config", () => {
-    const result = senseInput("hello hey there", {
+    const result = senseInput("john smith here", {
       disable: ["entropy"],
       rules: { repeatedWord: { maxAllowedRatio: 0.6 } }
     });
@@ -422,5 +422,10 @@ describe("senseInput", () => {
       disable: ["spaceRequired", "minLength"]
     });
     expect(result).toBe(null);
+  });
+
+  it("flags placeholder word in full name via type fullName", () => {
+    const result = senseInput("test user", { type: "fullName" });
+    expect(result).toContain("placeholder");
   });
 });

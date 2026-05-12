@@ -36,4 +36,10 @@ describe("placeholderWordRule", () => {
     it("returns null for empty input with custom words", () => {
         expect(placeholderWordRule("", ["foo"])).toBe(null);
     });
+
+    it("detects placeholder word in multi-word input", () => {
+        expect(placeholderWordRule("test user")).toBeTruthy();
+        expect(placeholderWordRule("dummy name")).toBeTruthy();
+        expect(placeholderWordRule("hello world")).toBeTruthy();
+    });
 });
