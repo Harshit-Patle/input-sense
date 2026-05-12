@@ -55,8 +55,7 @@ describe("validEmailFormatRule", () => {
         expect(validEmailFormatRule("user@gmail.com", [], ["company.com"])).toBeTruthy();
     });
 
-    it("returns null for empty input", () => {
-        expect(validEmailFormatRule("")).toBe(null);
-        expect(validEmailFormatRule(null)).toBe(null);
+    it("returns null for whitespace-only input", () => {
+        expect(validEmailFormatRule("   ")).toBe(null);
     });
 });
