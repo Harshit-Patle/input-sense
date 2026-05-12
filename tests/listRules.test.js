@@ -6,12 +6,13 @@ describe("listRules", () => {
         expect(Array.isArray(listRules())).toBe(true);
     });
 
-    it("returns all 15 rules", () => {
-        expect(listRules().length).toBe(15);
+    it("returns all 16 rules", () => {
+        expect(listRules().length).toBe(16);
     });
 
     it("contains all expected rule names", () => {
         const rules = listRules();
+        expect(rules).toContain("spaceRequired");
         expect(rules).toContain("repeatedChar");
         expect(rules).toContain("allCaps");
         expect(rules).toContain("unicodeOnly");
@@ -26,11 +27,12 @@ describe("listRules", () => {
         expect(rules).toContain("keyboardPattern");
         expect(rules).toContain("entropy");
         expect(rules).toContain("lowVowelRatio");
+        expect(rules).toContain("validEmailFormat");
     });
 
     it("returns rules in execution order", () => {
         const rules = listRules();
-        expect(rules[0]).toBe("repeatedChar");
+        expect(rules[0]).toBe("spaceRequired");
         expect(rules[rules.length - 1]).toBe("validEmailFormat");
     });
 

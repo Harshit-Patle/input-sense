@@ -389,4 +389,38 @@ describe("senseInput", () => {
     });
     expect(result).toContain("disposable");
   });
+
+  // fullName type preset tests
+  it("flags single word name via type fullName", () => {
+    const result = senseInput("HarshitPatle", { type: "fullName" });
+    expect(result).toBeTruthy();
+  });
+
+  it("flags missing space in full name via type fullName", () => {
+    const result = senseInput("JohnSmith", { type: "fullName" });
+    expect(result).toContain("full name");
+  });
+
+  it("flags all caps full name via type fullName", () => {
+    const result = senseInput("HARSHIT PATLE", { type: "fullName" });
+    expect(result).toContain("uppercase");
+  });
+
+  it("flags repeated words in full name via type fullName", () => {
+    const result = senseInput("aaaa aaaa", { type: "fullName" });
+    expect(result).toContain("repeated words");
+  });
+
+  it("returns null for valid full name via type fullName", () => {
+    const result = senseInput("Harshit Patle", { type: "fullName" });
+    expect(result).toBe(null);
+  });
+
+  it("allows disabling spaceRequired for mononyms", () => {
+    const result = senseInput("Beyonce", {
+      type: "fullName",
+      disable: ["spaceRequired", "minLength"]
+    });
+    expect(result).toBe(null);
+  });
 });
