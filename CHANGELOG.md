@@ -3,6 +3,40 @@
 > ℹ️ Note: Versions prior to 0.4.0 were early experimental releases.
 > This changelog tracks stable, user-facing changes from 0.4.0 onward.
 
+## 0.13.0
+
+- Added `type` option with preset system — automatically configures rules for specific input fields
+- Added `type: "email"` preset with comprehensive real-world email validation:
+  - Format checks: `@` count, local part length (2–64 chars), total length (max 254 chars)
+  - Blocks all-numeric local parts, consecutive dots, leading/trailing dots
+  - Blocks domain names with digits (catches `gmai1.com`, `g00gle.com`)
+  - Blocks domains starting or ending with hyphens, consecutive dots in domain
+  - Expanded blocked disposable domains list (33 providers)
+  - Blocked system local parts (`noreply`, `postmaster`, `support`, `admin` etc.)
+  - Placeholder detection in local part segments (`test.user@`, `demo_app@`)
+  - Plus-tag placeholder detection (`test+123@gmail.com` → fail, `harshit+work@gmail.com` → pass)
+  - `allowedDomains` — whitelist specific domains
+  - `blockedDomains` — add custom blocked domains
+- Added `type: "fullName"` preset with real-world name validation:
+  - Requires space between first and last name (`spaceRequired` rule)
+  - Each name part must be at least 2 characters
+  - No digits allowed in any name part
+  - Supports hyphenated names (`Mary-Jane Watson`)
+  - Supports apostrophe names (`O'Brien Connor`)
+  - Supports accented/Unicode characters (`María García`)
+  - Supports dotted prefixes (`St. John Smith`)
+  - Normalizes multiple spaces automatically
+  - Maximum 100 characters total
+- Added `spaceRequired` rule — flags inputs missing a space
+- Added `namePartsRule` rule — validates individual name parts
+- Added `validEmailFormat` rule — comprehensive email format and quality checking
+- Extended `keyboardPattern` rule to check segments in compound inputs (`qwerty@gmail.com`)
+- Extended `placeholderWord` rule to check individual words in multi-word inputs
+- Updated TypeScript typings for type presets, new rules, and config options
+- Added `listTypes()` utility groundwork via preset system
+- Expanded test suite from 157 to 231 tests
+- No breaking changes
+
 ## 0.12.0
 
 - Added CJS dual build — package now ships both ESM and CommonJS via `dist/index.cjs`

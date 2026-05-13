@@ -42,6 +42,7 @@ input-sense helps detect such inputs early and improve overall data quality.
 - Detects all-caps inputs
 - Detects unicode/emoji-only inputs
 - Detects leet speak placeholder variants (e.g. `4dmin`, `t3st`)
+- **Input type presets** — smart rule configuration for `email` and `fullName` fields
 - Supports returning all detected issues (`mode: "all"`)
 - Supports structured output with rule names (`mode: "detailed"`)
 - Supports quality scoring (`mode: "score"`)
@@ -106,6 +107,140 @@ const { senseInput } = require("input-sense");
 
 ---
 
+## Input Type Presets
+
+Use the `type` option to automatically apply the right rules for a specific form field.
+No need to manually configure `disable`, `rules`, or `priority` — the preset handles it.
+
+### `type: "email"`
+
+Validates email inputs with comprehensive real-world checks:
+
+```js
+senseInput("harshit@gmail.com", { type: "email" })
+// null — valid email
+
+senseInput("test@gmail.com", { type: "email" })
+// "Email local part looks like a placeholder"
+
+senseInput("user@mailinator.com", { type: "email" })
+// "Email domain looks disposable or fake"
+
+senseInput("noreply@gmail.com", { type: "email" })
+// "Email local part looks like a system address"
+
+senseInput("notanemail", { type: "email" })
+// "Input does not look like a valid email address"
+
+senseInput("1234@gmail.com", { type: "email" })
+// "Input does not look like a valid email address"
+
+senseInput("user@gmai1.com", { type: "email" })
+// "Input does not look like a valid email address"
+
+senseInput("test+123@gmail.com", { type: "email" })
+// "Email local part looks like a placeholder"
+
+senseInput("harshit+work@gmail.com", { type: "email" })
+// null — legitimate plus tag
+```
+
+**Email config options:**
+
+```js
+// Only allow specific domains
+senseInput("user@gmail.com", {
+  type: "email",
+  rules: {
+    validEmailFormat: {
+      allowedDomains: ["company.com", "company.co.in"]
+    }
+  }
+})
+// "Email domain is not accepted"
+
+// Block additional domains
+senseInput("user@competitor.com", {
+  type: "email",
+  rules: {
+    validEmailFormat: {
+      blockedDomains: ["competitor.com"]
+    }
+  }
+})
+// "Email domain looks disposable or fake"
+```
+
+**What email validation covers:**
+- Format: `@` count, local part 2–64 chars, total max 254 chars
+- No all-numeric local parts, no consecutive dots, no leading/trailing dots
+- Domain name cannot contain digits (catches `gmai1.com`, `g00gle.com`)
+- Domain cannot start or end with hyphens
+- 33 built-in blocked disposable domains
+- Blocked system addresses: `noreply`, `postmaster`, `support`, `admin`, `info` and more
+- Placeholder detection in local part segments (`test.user@`, `demo_app@`)
+- Plus-tag placeholder detection
+
+---
+
+### `type: "fullName"`
+
+Validates full name inputs requiring first and last name:
+
+```js
+senseInput("Harshit Patle", { type: "fullName" })
+// null — valid full name
+
+senseInput("Harshit", { type: "fullName" })
+// "Please enter your full name (first and last name)"
+
+senseInput("HARSHIT PATLE", { type: "fullName" })
+// "Input contains only uppercase letters and looks non-meaningful"
+
+senseInput("J Smith", { type: "fullName" })
+// "Each part of your name must be at least 2 characters"
+
+senseInput("John 123", { type: "fullName" })
+// "Name parts must contain only letters"
+
+senseInput("Mary-Jane Watson", { type: "fullName" })
+// null — hyphenated names supported
+
+senseInput("O'Brien Connor", { type: "fullName" })
+// null — apostrophe names supported
+
+senseInput("María García", { type: "fullName" })
+// null — accented characters supported
+
+senseInput("St. John Smith", { type: "fullName" })
+// null — dotted prefixes supported
+
+senseInput("john smith", { type: "fullName" })
+// null — casing is not enforced
+```
+
+**What fullName validation covers:**
+- Must contain a space (first and last name required)
+- Each name part minimum 2 characters
+- No digits in any name part
+- Supports hyphens, apostrophes, dots in names
+- Supports Unicode/accented characters
+- Normalizes multiple spaces automatically
+- Maximum 100 characters total
+- Catches placeholder words, repeated chars, all-caps, keyboard patterns
+
+**Disable space requirement for mononyms:**
+
+```js
+senseInput("Beyonce", {
+  type: "fullName",
+  disable: ["spaceRequired"]
+})
+// null
+```
+
+---
+
 ## Advanced Usage
 
 ### Get all detected issues
@@ -131,7 +266,6 @@ senseInput("aaaa", { mode: "detailed" });
 
 Use `mode: "score"` to get a 0–100 quality score instead of pass/fail.
 100 means fully clean, 0 means completely unusable.
-This is useful for analytics, soft warnings, and live quality indicators.
 
 ```js
 senseInput("Harshit", { mode: "score" });
@@ -139,38 +273,29 @@ senseInput("Harshit", { mode: "score" });
 
 senseInput("aaaa", { mode: "score" });
 // 0
-
-senseInput("HELLO", { mode: "score" });
-// 70
 ```
 
 ### Validate multiple fields at once
 
 Use `senseInputBatch` to validate an entire form object in one call.
-It accepts the same options as `senseInput` and applies them to every field.
 
 ```js
 import { senseInputBatch } from "input-sense";
 
 senseInputBatch({
-  username: "aaaa",
-  email: "test",
-  bio: "Harshit"
-});
-// { username: "Input looks like repeated characters", email: "Input looks like a placeholder word", bio: null }
+  email: "harshit@gmail.com",
+  fullName: "Harshit Patle"
+}, { type: "email" });
 ```
 
-Works with all modes:
+Or validate different field types separately:
 
 ```js
-senseInputBatch({ username: "aaaa" }, { mode: "score" });
-// { username: 0 }
+const emailResult = senseInput(emailValue, { type: "email" });
+const nameResult = senseInput(nameValue, { type: "fullName" });
 ```
 
 ### Control rule execution order
-
-Use the `priority` option to run specific rules first.
-Rules not mentioned in `priority` run after in their default order.
 
 ```js
 senseInput("aaaa", {
@@ -178,20 +303,18 @@ senseInput("aaaa", {
   rules: { minLength: { minLength: 5 } }
 });
 // "Input is too short to be meaningful (minimum 5 characters)"
-// minLength fires first even though repeatedChar would normally run earlier
 ```
 
 ### Discover available rules at runtime
-
-Use `listRules` to get all available rule names in execution order.
 
 ```js
 import { listRules } from "input-sense";
 
 listRules();
-// ["repeatedChar", "allCaps", "unicodeOnly", "symbolOnly", "numericOnly",
-//  "placeholderWord", "leetSpeak", "repeatedWord", "minLength", "sequential",
-//  "reverseSequential", "keyboardPattern", "entropy", "lowVowelRatio"]
+// ["spaceRequired", "repeatedChar", "allCaps", "unicodeOnly", "symbolOnly",
+//  "numericOnly", "placeholderWord", "leetSpeak", "repeatedWord", "minLength",
+//  "sequential", "reverseSequential", "keyboardPattern", "entropy",
+//  "lowVowelRatio", "validEmailFormat", "namePartsRule"]
 ```
 
 ### Disable specific rules
@@ -205,8 +328,6 @@ senseInput("aa", {
 
 ### Rule Configuration Examples
 
-You can fine-tune rules using the `rules` option.
-
 #### repeatedChar — custom repetition threshold
 
 ```js
@@ -214,33 +335,6 @@ senseInput("aaa", {
   rules: { repeatedChar: { threshold: 4 } }
 });
 // null — only flags when 5+ repetitions
-```
-
-#### allCaps — custom minimum length
-
-```js
-senseInput("OK", {
-  rules: { allCaps: { minLength: 2 } }
-});
-// "Input contains only uppercase letters and looks non-meaningful"
-```
-
-#### unicodeOnly — custom minimum length
-
-```js
-senseInput("🔥", {
-  rules: { unicodeOnly: { minLength: 3 } }
-});
-// null — input is too short to check
-```
-
-#### leetSpeak — add custom words
-
-```js
-senseInput("mycust0mw0rd", {
-  rules: { leetSpeak: { customWords: ["mycustomword"] } }
-});
-// "Input looks like a leet speak placeholder word"
 ```
 
 #### placeholderWord — add custom words
@@ -267,16 +361,7 @@ senseInput("qw", {
 senseInput("hey hey there", {
   rules: { repeatedWord: { maxAllowedRatio: 0.6 } }
 });
-// null — duplication ratio is within the allowed limit
-```
-
-#### lowVowelRatio — relax vowel requirement
-
-```js
-senseInput("bcdfgh", {
-  rules: { lowVowelRatio: { minRatio: 0.1 } }
-});
-// null — ratio threshold is relaxed
+// null
 ```
 
 #### minLength — custom minimum length
@@ -286,14 +371,6 @@ senseInput("hello", {
   rules: { minLength: { minLength: 6 } }
 });
 // "Input is too short to be meaningful (minimum 6 characters)"
-```
-
-#### entropy — custom character diversity
-
-```js
-senseInput("abcdef", {
-  rules: { entropy: { minLength: 6, minRatio: 0.9 } }
-});
 ```
 
 ### When to use each mode
@@ -323,6 +400,8 @@ senseInput("abcdef", {
 | `minLength` | `minLength` | `number` | `4` | Min required input length |
 | `entropy` | `minLength` | `number` | `6` | Min length before checking |
 | `entropy` | `minRatio` | `number` | `0.6` | Min character diversity ratio |
+| `validEmailFormat` | `allowedDomains` | `string[]` | `[]` | Whitelist specific domains |
+| `validEmailFormat` | `blockedDomains` | `string[]` | `[]` | Extra domains to block |
 
 All rules have safe defaults. Unknown rule names in `rules` config are safely ignored.
 
@@ -374,7 +453,7 @@ senseInput("Harshit");
 
 This project uses automated test coverage to ensure reliability.
 Coverage is collected and reported on every commit via CI.
-All 14 rule files maintain 100% coverage across statements, branches, functions, and lines.
+All rule files maintain 100% coverage across statements, branches, functions, and lines.
 
 ---
 
@@ -388,14 +467,13 @@ It runs a series of small, focused rules to answer one question:
 
 - Each rule checks a specific pattern
 - Rules run in a configurable order
+- Type presets automatically apply the right rules for each field
 - By default, the first issue is returned
 - You can opt into collecting all issues, structured output, or a quality score
 
 ---
 
 ## How it works
-
-The library runs multiple checks in a fixed order and returns the first detected issue.
 
 ### Validation flow
 
@@ -404,7 +482,7 @@ User Input
 ↓
 Regex / Required Validation
 ↓
-input-sense (intent detection)
+input-sense (intent detection — with optional type preset)
 ↓
 Backend Validation
 ```
@@ -451,6 +529,8 @@ All core validation rules are covered by automated tests and enforced via CI.
 
 | Use case | Recommendation |
 |----------|----------------|
+| Email field | `type: "email"` |
+| Full name field | `type: "fullName"` |
 | Simple forms | Default mode |
 | Rich UX | `mode: "all"` |
 | Rule-specific UX | `mode: "detailed"` |
