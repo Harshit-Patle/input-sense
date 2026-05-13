@@ -6,8 +6,8 @@ describe("listRules", () => {
         expect(Array.isArray(listRules())).toBe(true);
     });
 
-    it("returns all 16 rules", () => {
-        expect(listRules().length).toBe(16);
+    it("returns all 17 rules", () => {
+        expect(listRules().length).toBe(17);
     });
 
     it("contains all expected rule names", () => {
@@ -33,7 +33,7 @@ describe("listRules", () => {
     it("returns rules in execution order", () => {
         const rules = listRules();
         expect(rules[0]).toBe("spaceRequired");
-        expect(rules[rules.length - 1]).toBe("validEmailFormat");
+        expect(rules[rules.length - 1]).toBe("namePartsRule");
     });
 
     it("returns a new array on each call", () => {

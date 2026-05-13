@@ -428,4 +428,24 @@ describe("senseInput", () => {
     const result = senseInput("test user", { type: "fullName" });
     expect(result).toContain("placeholder");
   });
+
+  it("flags numeric part in full name via type fullName", () => {
+    const result = senseInput("John 123", { type: "fullName" });
+    expect(result).toContain("letters");
+  });
+
+  it("flags single letter part in full name via type fullName", () => {
+    const result = senseInput("J Smith", { type: "fullName" });
+    expect(result).toContain("2 characters");
+  });
+
+  it("returns null for hyphenated name via type fullName", () => {
+    const result = senseInput("Mary-Jane Watson", { type: "fullName" });
+    expect(result).toBe(null);
+  });
+
+  it("returns null for name with apostrophe via type fullName", () => {
+    const result = senseInput("O'Brien Connor", { type: "fullName" });
+    expect(result).toBe(null);
+  });
 });
