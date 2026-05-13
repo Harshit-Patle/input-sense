@@ -50,8 +50,12 @@ describe("namePartsRule", () => {
         expect(namePartsRule("")).toBe(null);
         expect(namePartsRule(null)).toBe(null);
     });
-    
+
     it("flags sub-part with no letters", () => {
         expect(namePartsRule("John @@ Smith")).toBeTruthy();
+    });
+
+    it("returns null for whitespace-only input", () => {
+        expect(namePartsRule("   ")).toBe(null);
     });
 });
