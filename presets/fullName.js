@@ -8,7 +8,7 @@ export const fullNamePreset = {
         "leetSpeak",
         "unicodeOnly"
     ],
-    enable: ["spaceRequired"],
+    enable: ["spaceRequired", "namePartsRule"],
     rules: {
         minLength: { minLength: 6 }
     }
