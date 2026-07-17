@@ -8,6 +8,7 @@ export const pinPreset = {
         "keyboardPattern",
         "entropy",
         "symbolOnly",
+        "numericOnly",
         "repeatedWord",
         "lowVowelRatio",
         "allCaps",
@@ -20,7 +21,7 @@ export const pinPreset = {
             minLength: 4,
             maxLength: 6,
             noRepeated: true,
-            noSequential: true
+            noSequential: false
         }
     }
 };
