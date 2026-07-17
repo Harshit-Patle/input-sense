@@ -5,7 +5,7 @@ export function pinRule(value, options = {}) {
         minLength = 4,
         maxLength = 6,
         noRepeated = true,
-        noSequential = true
+        noSequential = false
     } = options;
 
     const normalized = value.trim();
