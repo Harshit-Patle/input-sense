@@ -449,3 +449,37 @@ describe("senseInput", () => {
     expect(result).toBe(null);
   });
 });
+
+// PIN preset tests
+it("detects invalid PIN format via type pin", () => {
+  const result = senseInput("123", { type: "pin" });
+  expect(result).toContain("PIN must be at least 4 digits");
+});
+
+it("detects repeated PIN digits via type pin", () => {
+  const result = senseInput("1111", { type: "pin" });
+  expect(result).toContain("PIN must not contain repeated digits");
+});
+
+it("detects sequential PIN digits via type pin", () => {
+  const result = senseInput("1234", { type: "pin" });
+  expect(result).toContain("PIN must not contain sequential digits");
+});
+
+it("returns null for valid PIN via type pin", () => {
+  const result = senseInput("1478", { type: "pin" });
+  expect(result).toBe(null);
+});
+
+it("allows 6-digit PIN via type pin", () => {
+  const result = senseInput("147258", { type: "pin" });
+  expect(result).toBe(null);
+});
+
+it("respects custom pinRule config via type pin", () => {
+  const result = senseInput("1111", {
+    type: "pin",
+    rules: { pinRule: { noRepeated: false } }
+  });
+  expect(result).toBe(null);
+});
