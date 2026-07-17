@@ -35,7 +35,7 @@ describe("listRules", () => {
     it("returns rules in execution order", () => {
         const rules = listRules();
         expect(rules[0]).toBe("spaceRequired");
-        expect(rules[rules.length - 1]).toBe("namePartsRule");
+        expect(rules[rules.length - 1]).toBe("pinRule");
     });
 
     it("returns a new array on each call", () => {
