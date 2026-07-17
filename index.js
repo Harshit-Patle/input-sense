@@ -17,6 +17,8 @@ import { emailPreset } from "./presets/email.js";
 import { spaceRequiredRule } from "./rules/spaceRequiredRule.js";
 import { fullNamePreset } from "./presets/fullName.js";
 import { namePartsRule } from "./rules/namePartsRule.js";
+import { pinRule } from "./rules/pinRule.js";
+import { pinPreset } from "./presets/pin.js";
 
 export function senseInput(value, options = {}) {
   const mode = options.mode || "first";
@@ -26,11 +28,12 @@ export function senseInput(value, options = {}) {
   const TYPE_PRESETS = {
     email: emailPreset,
     fullName: fullNamePreset,
+    pin: pinPreset,
   };
 
   const preset = options.type ? (TYPE_PRESETS[options.type] || {}) : {};
   const presetEnable = preset.enable || [];
-  const DEFAULT_DISABLED = ["validEmailFormat", "spaceRequired", "namePartsRule"];
+  const DEFAULT_DISABLED = ["validEmailFormat", "spaceRequired", "namePartsRule", "pinRule"];
   const mergedDisable = [
     ...DEFAULT_DISABLED.filter(r => !presetEnable.includes(r)),
     ...(preset.disable || []),
@@ -56,6 +59,7 @@ export function senseInput(value, options = {}) {
     validEmailFormat: 100,
     spaceRequired: 100,
     namePartsRule: 100,
+    pinRule: 100,
   };
 
   const KNOWN_RULES = [
@@ -75,7 +79,8 @@ export function senseInput(value, options = {}) {
     "leetSpeak",
     "validEmailFormat",
     "spaceRequired",
-    "namePartsRule"
+    "namePartsRule",
+    "pinRule",
   ];
 
   if (process.env.NODE_ENV !== "production") {
@@ -168,6 +173,10 @@ export function senseInput(value, options = {}) {
         (mergedRules.validEmailFormat || {}).allowedDomains
       ),
     },
+    {
+      name: "pinRule",
+      run: () => pinRule(value, (mergedRules.pinRule || {})),
+    },
   ];
 
   const orderedRules = [
@@ -238,5 +247,6 @@ export function listRules() {
     "lowVowelRatio",
     "validEmailFormat",
     "namePartsRule",
+    "pinRule"
   ];
 }
