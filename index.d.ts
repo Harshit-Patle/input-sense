@@ -1,6 +1,6 @@
 export type SenseMode = "first" | "all" | "detailed" | "score";
 
-export type InputType = "email" | "fullName";
+export type InputType = "email" | "fullName" | "pin";
 
 export type RuleName =
   | "repeatedChar"
@@ -19,7 +19,8 @@ export type RuleName =
   | "leetSpeak"
   | "validEmailFormat"
   | "spaceRequired"
-  | "namePartsRule";
+  | "namePartsRule"
+  | "pinRule";
 
 export interface RepeatedCharRuleConfig {
   threshold?: number;
@@ -67,6 +68,13 @@ export interface SpaceRequiredRuleConfig {
   // No config options currently
 }
 
+export interface PinRuleConfig {
+  minLength?: number;
+  maxLength?: number;
+  noRepeated?: boolean;
+  noSequential?: boolean;
+}
+
 export interface RuleConfigs {
   repeatedChar?: RepeatedCharRuleConfig;
   keyboardPattern?: KeyboardPatternRuleConfig;
@@ -79,6 +87,7 @@ export interface RuleConfigs {
   validEmailFormat?: ValidEmailFormatRuleConfig;
   namePartsRule?: NamePartsRuleConfig;
   spaceRequired?: SpaceRequiredRuleConfig;
+  pinRule?: PinRuleConfig;
   // Existing rules without config remain as any or can be added later
   minLength?: { minLength?: number };
   entropy?: { minLength?: number; minEntropy?: number };
