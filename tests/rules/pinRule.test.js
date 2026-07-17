@@ -54,15 +54,15 @@ describe("pinRule", () => {
     });
 
     // Sequential digits
-    it("flags PIN with sequential digits", () => {
-        expect(pinRule("1234")).toBeTruthy();
-        expect(pinRule("4567")).toBeTruthy();
-        expect(pinRule("6789")).toBeTruthy();
+    it("flags PIN with sequential digits when noSequential is true", () => {
+        expect(pinRule("1234", { noSequential: true })).toBeTruthy();
+        expect(pinRule("4567", { noSequential: true })).toBeTruthy();
+        expect(pinRule("6789", { noSequential: true })).toBeTruthy();
     });
 
-    it("flags PIN with reverse sequential digits", () => {
-        expect(pinRule("9876")).toBeTruthy();
-        expect(pinRule("5432")).toBeTruthy();
+    it("flags PIN with reverse sequential digits when noSequential is true", () => {
+        expect(pinRule("9876", { noSequential: true })).toBeTruthy();
+        expect(pinRule("5432", { noSequential: true })).toBeTruthy();
     });
 
     // Custom options

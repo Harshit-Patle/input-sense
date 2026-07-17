@@ -461,8 +461,16 @@ it("detects repeated PIN digits via type pin", () => {
   expect(result).toContain("PIN must not contain repeated digits");
 });
 
-it("detects sequential PIN digits via type pin", () => {
+it("allows sequential PIN digits via type pin (default behavior)", () => {
   const result = senseInput("1234", { type: "pin" });
+  expect(result).toBe(null);
+});
+
+it("flags sequential PIN digits when noSequential is true", () => {
+  const result = senseInput("1234", {
+    type: "pin",
+    rules: { pinRule: { noSequential: true } }
+  });
   expect(result).toContain("PIN must not contain sequential digits");
 });
 
