@@ -1,6 +1,6 @@
 export type SenseMode = "first" | "all" | "detailed" | "score";
 
-export type InputType = "email" | "fullName" | "pin" | "phone";
+export type InputType = "email" | "fullName" | "pin" | "phone" | "password";
 
 export type RuleName =
   | "repeatedChar"
@@ -21,7 +21,8 @@ export type RuleName =
   | "spaceRequired"
   | "namePartsRule"
   | "pinRule"
-  | "phoneRule";
+  | "phoneRule"
+  | "passwordStrength";
 
 export interface RepeatedCharRuleConfig {
   threshold?: number;
@@ -86,6 +87,15 @@ export interface PhoneRuleConfig {
   noRepeated?: boolean;
 }
 
+export interface PasswordStrengthRuleConfig {
+  minLength?: number;
+  requireUppercase?: boolean;
+  requireLowercase?: boolean;
+  requireNumber?: boolean;
+  requireSpecial?: boolean;
+  checkCommon?: boolean;
+}
+
 export interface RuleConfigs {
   repeatedChar?: RepeatedCharRuleConfig;
   keyboardPattern?: KeyboardPatternRuleConfig;
@@ -100,6 +110,7 @@ export interface RuleConfigs {
   spaceRequired?: SpaceRequiredRuleConfig;
   pinRule?: PinRuleConfig;
   phoneRule?: PhoneRuleConfig;
+  passwordStrength?: PasswordStrengthRuleConfig;
   // Existing rules without config remain as any or can be added later
   minLength?: { minLength?: number };
   entropy?: { minLength?: number; minEntropy?: number };
