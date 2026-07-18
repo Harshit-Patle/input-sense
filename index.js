@@ -21,6 +21,8 @@ import { pinRule } from "./rules/pinRule.js";
 import { pinPreset } from "./presets/pin.js";
 import { phoneRule } from "./rules/phoneRule.js";
 import { phonePreset } from "./presets/phone.js";
+import { passwordStrengthRule } from "./rules/passwordStrengthRule.js";
+import { passwordPreset } from "./presets/password.js";
 
 export function senseInput(value, options = {}) {
   const mode = options.mode || "first";
@@ -32,11 +34,19 @@ export function senseInput(value, options = {}) {
     fullName: fullNamePreset,
     pin: pinPreset,
     phone: phonePreset,
+    password: passwordPreset,
   };
 
   const preset = options.type ? (TYPE_PRESETS[options.type] || {}) : {};
   const presetEnable = preset.enable || [];
-  const DEFAULT_DISABLED = ["validEmailFormat", "spaceRequired", "namePartsRule", "pinRule", "phoneRule"];
+  const DEFAULT_DISABLED = [
+    "validEmailFormat",
+    "spaceRequired",
+    "namePartsRule",
+    "pinRule",
+    "phoneRule",
+    "passwordStrength"
+  ];
   const mergedDisable = [
     ...DEFAULT_DISABLED.filter(r => !presetEnable.includes(r)),
     ...(preset.disable || []),
@@ -64,6 +74,7 @@ export function senseInput(value, options = {}) {
     namePartsRule: 100,
     pinRule: 100,
     phoneRule: 60,
+    passwordStrength: 80,
   };
 
   const KNOWN_RULES = [
@@ -86,6 +97,7 @@ export function senseInput(value, options = {}) {
     "namePartsRule",
     "pinRule",
     "phoneRule",
+    "passwordStrength",
   ];
 
   if (process.env.NODE_ENV !== "production") {
@@ -186,6 +198,10 @@ export function senseInput(value, options = {}) {
       name: "phoneRule",
       run: () => phoneRule(value, (mergedRules.phoneRule || {})),
     },
+    {
+      name: "passwordStrength",
+      run: () => passwordStrengthRule(value, (mergedRules.passwordStrength || {})),
+    },
   ];
 
   const orderedRules = [
@@ -257,6 +273,7 @@ export function listRules() {
     "validEmailFormat",
     "namePartsRule",
     "pinRule",
-    "phoneRule"
+    "phoneRule",
+    "passwordStrength"
   ];
 }
