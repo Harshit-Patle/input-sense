@@ -19,6 +19,8 @@ import { fullNamePreset } from "./presets/fullName.js";
 import { namePartsRule } from "./rules/namePartsRule.js";
 import { pinRule } from "./rules/pinRule.js";
 import { pinPreset } from "./presets/pin.js";
+import { phoneRule } from "./rules/phoneRule.js";
+import { phonePreset } from "./presets/phone.js";
 
 export function senseInput(value, options = {}) {
   const mode = options.mode || "first";
@@ -29,11 +31,12 @@ export function senseInput(value, options = {}) {
     email: emailPreset,
     fullName: fullNamePreset,
     pin: pinPreset,
+    phone: phonePreset,
   };
 
   const preset = options.type ? (TYPE_PRESETS[options.type] || {}) : {};
   const presetEnable = preset.enable || [];
-  const DEFAULT_DISABLED = ["validEmailFormat", "spaceRequired", "namePartsRule", "pinRule"];
+  const DEFAULT_DISABLED = ["validEmailFormat", "spaceRequired", "namePartsRule", "pinRule", "phoneRule"];
   const mergedDisable = [
     ...DEFAULT_DISABLED.filter(r => !presetEnable.includes(r)),
     ...(preset.disable || []),
@@ -60,6 +63,7 @@ export function senseInput(value, options = {}) {
     spaceRequired: 100,
     namePartsRule: 100,
     pinRule: 100,
+    phoneRule: 60,
   };
 
   const KNOWN_RULES = [
@@ -81,6 +85,7 @@ export function senseInput(value, options = {}) {
     "spaceRequired",
     "namePartsRule",
     "pinRule",
+    "phoneRule",
   ];
 
   if (process.env.NODE_ENV !== "production") {
@@ -177,6 +182,10 @@ export function senseInput(value, options = {}) {
       name: "pinRule",
       run: () => pinRule(value, (mergedRules.pinRule || {})),
     },
+    {
+      name: "phoneRule",
+      run: () => phoneRule(value, (mergedRules.phoneRule || {})),
+    },
   ];
 
   const orderedRules = [
@@ -247,6 +256,7 @@ export function listRules() {
     "lowVowelRatio",
     "validEmailFormat",
     "namePartsRule",
-    "pinRule"
+    "pinRule",
+    "phoneRule"
   ];
 }
