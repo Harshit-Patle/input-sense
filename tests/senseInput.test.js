@@ -525,3 +525,32 @@ it("respects custom phoneRule config via type phone", () => {
   });
   expect(result).toContain("Phone number must not contain repeated digits");
 });
+
+// Password preset tests
+it("detects weak password via type password", () => {
+  const result = senseInput("harshit", { type: "password" });
+  expect(result).toContain("uppercase");
+});
+
+it("detects common password via type password", () => {
+  const result = senseInput("password", { type: "password" });
+  expect(result).toContain("common");
+});
+
+it("detects missing special char via type password", () => {
+  const result = senseInput("Harshit123", { type: "password" });
+  expect(result).toContain("special");
+});
+
+it("returns null for strong password via type password", () => {
+  const result = senseInput("Harshit@123", { type: "password" });
+  expect(result).toBe(null);
+});
+
+it("respects custom passwordStrength config via type password", () => {
+  const result = senseInput("Harshit123", {
+    type: "password",
+    rules: { passwordStrength: { requireSpecial: false } }
+  });
+  expect(result).toBe(null);
+});

@@ -6,10 +6,10 @@ describe("listRules", () => {
         expect(Array.isArray(listRules())).toBe(true);
     });
 
-    it("returns all rules including phoneRule", () => {
+    it("returns all rules including passwordStrength", () => {
         const rules = listRules();
-        expect(rules.length).toBe(19); 
-        expect(rules).toContain("phoneRule");
+        expect(rules.length).toBe(20);
+        expect(rules).toContain("passwordStrength");
     });
 
     it("contains all expected rule names", () => {
@@ -35,7 +35,7 @@ describe("listRules", () => {
     it("returns rules in execution order", () => {
         const rules = listRules();
         expect(rules[0]).toBe("spaceRequired");
-        expect(rules[rules.length - 1]).toBe("phoneRule");
+        expect(rules[rules.length - 1]).toBe("passwordStrength");
     });
 
     it("returns a new array on each call", () => {
