@@ -3,7 +3,9 @@ export const passwordPreset = {
         "lowVowelRatio",
         "symbolOnly",
         "allCaps",
-        "unicodeOnly"
+        "unicodeOnly",
+        "placeholderWord",
+        "leetSpeak"
     ],
     enable: ["passwordStrength"],
     rules: {
