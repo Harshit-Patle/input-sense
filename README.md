@@ -20,11 +20,13 @@ Most validation libraries focus on syntax, not intent.
 
 Inputs like:
 
-- aaaa
-- test
-- 123456
-- qwerty
-- asdf
+- `aaaa`
+- `test`
+- `123456`
+- `qwerty`
+- `asdf`
+- `😊😊😊`
+- `password`
 
 often pass validation even though they are meaningless.
 
@@ -42,7 +44,7 @@ input-sense helps detect such inputs early and improve overall data quality.
 - Detects all-caps inputs
 - Detects unicode/emoji-only inputs
 - Detects leet speak placeholder variants (e.g. `4dmin`, `t3st`)
-- **Input type presets** — smart rule configuration for `email` and `fullName` fields
+- **Input type presets** — smart rule configuration for `email`, `fullName`, `pin`, `phone`, and `password` fields
 - Supports returning all detected issues (`mode: "all"`)
 - Supports structured output with rule names (`mode: "detailed"`)
 - Supports quality scoring (`mode: "score"`)
@@ -241,6 +243,180 @@ senseInput("Beyonce", {
 
 ---
 
+### `type: "pin"`
+
+Validates PIN inputs for numeric-only fields:
+
+```js
+senseInput("1478", { type: "pin" })
+// null — valid PIN
+
+senseInput("123", { type: "pin" })
+// "PIN must be at least 4 digits"
+
+senseInput("1111", { type: "pin" })
+// "PIN must not contain repeated digits"
+
+senseInput("1234", { type: "pin" })
+// null — sequential digits allowed by default
+
+senseInput("147258", { type: "pin" })
+// null — valid 6-digit PIN
+
+senseInput("1234567", { type: "pin" })
+// "PIN must be at most 6 digits"
+
+senseInput("abcd", { type: "pin" })
+// "PIN must contain only numbers"
+```
+
+**PIN config options:**
+
+```js
+// Disallow sequential digits
+senseInput("1234", {
+  type: "pin",
+  rules: { pinRule: { noSequential: true } }
+})
+// "PIN must not contain sequential digits"
+
+// Allow repeated digits
+senseInput("1111", {
+  type: "pin",
+  rules: { pinRule: { noRepeated: false } }
+})
+// null
+```
+
+**What PIN validation covers:**
+- Numeric-only (no letters, no special characters)
+- Default length: 4–6 digits (configurable)
+- No repeated digits (configurable, default: true)
+- No sequential digits (configurable, default: false)
+- Configurable min/max length
+
+---
+
+### `type: "phone"`
+
+Validates phone numbers with international format support:
+
+```js
+senseInput("1234567890", { type: "phone" })
+// null — valid 10-digit phone
+
+senseInput("(123) 456-7890", { type: "phone" })
+// null — formatted phone
+
+senseInput("+1 234-567-8900", { type: "phone" })
+// null — international format
+
+senseInput("+91 98765 43210", { type: "phone" })
+// null — India format
+
+senseInput("123", { type: "phone" })
+// "Phone number must contain at least 10 digits"
+
+senseInput("abc123", { type: "phone" })
+// "Phone number must contain only numbers and valid separators"
+
+senseInput("1111111111", { type: "phone" })
+// null — repeated digits allowed by default
+```
+
+**Phone config options:**
+
+```js
+// Disallow repeated digits
+senseInput("1111111111", {
+  type: "phone",
+  rules: { phoneRule: { noRepeated: true } }
+})
+// "Phone number must not contain repeated digits"
+
+// Custom digit range
+senseInput("12345", {
+  type: "phone",
+  rules: { phoneRule: { minDigits: 5, maxDigits: 15 } }
+})
+// null
+```
+
+**What phone validation covers:**
+- Digit count: 10–15 by default (configurable)
+- Allows separators: `+`, spaces, dashes, parentheses (configurable)
+- No letters allowed
+- Repeated digits check (configurable, default: false)
+- International format support
+
+---
+
+### `type: "password"`
+
+Validates password strength with comprehensive checks:
+
+```js
+senseInput("Harshit@123", { type: "password" })
+// null — strong password
+
+senseInput("harshit", { type: "password" })
+// "Password must be at least 8 characters"
+
+senseInput("harshit123", { type: "password" })
+// "Password must contain at least 1 uppercase letter"
+
+senseInput("HARSHIT123", { type: "password" })
+// "Password must contain at least 1 lowercase letter"
+
+senseInput("Harshit@", { type: "password" })
+// "Password must contain at least 1 number"
+
+senseInput("Harshit123", { type: "password" })
+// "Password must contain at least 1 special character"
+
+senseInput("password", { type: "password" })
+// "Password is too common and easily guessable"
+
+senseInput("P@ssw0rd", { type: "password" })
+// "Password is too common and easily guessable"
+```
+
+**Password config options:**
+
+```js
+// Custom minimum length
+senseInput("H@1", {
+  type: "password",
+  rules: { passwordStrength: { minLength: 3, requireSpecial: true } }
+})
+// null
+
+// Skip uppercase requirement
+senseInput("harshit@123", {
+  type: "password",
+  rules: { passwordStrength: { requireUppercase: false } }
+})
+// null
+
+// Skip common password check
+senseInput("password123", {
+  type: "password",
+  rules: { passwordStrength: { checkCommon: false } }
+})
+// null
+```
+
+**What password validation covers:**
+- Minimum length: 8 by default (configurable)
+- At least 1 uppercase letter (configurable)
+- At least 1 lowercase letter (configurable)
+- At least 1 number (configurable)
+- At least 1 special character (configurable)
+- Common password blacklist (50+ entries, configurable)
+- Works alongside existing rules (repeatedChar, keyboardPattern, sequential, leetSpeak, entropy, minLength)
+
+---
+
 ## Advanced Usage
 
 ### Get all detected issues
@@ -293,6 +469,9 @@ Or validate different field types separately:
 ```js
 const emailResult = senseInput(emailValue, { type: "email" });
 const nameResult = senseInput(nameValue, { type: "fullName" });
+const pinResult = senseInput(pinValue, { type: "pin" });
+const phoneResult = senseInput(phoneValue, { type: "phone" });
+const passwordResult = senseInput(passwordValue, { type: "password" });
 ```
 
 ### Control rule execution order
@@ -314,7 +493,8 @@ listRules();
 // ["spaceRequired", "repeatedChar", "allCaps", "unicodeOnly", "symbolOnly",
 //  "numericOnly", "placeholderWord", "leetSpeak", "repeatedWord", "minLength",
 //  "sequential", "reverseSequential", "keyboardPattern", "entropy",
-//  "lowVowelRatio", "validEmailFormat", "namePartsRule"]
+//  "lowVowelRatio", "validEmailFormat", "namePartsRule", "pinRule",
+//  "phoneRule", "passwordStrength"]
 ```
 
 ### Disable specific rules
@@ -373,6 +553,36 @@ senseInput("hello", {
 // "Input is too short to be meaningful (minimum 6 characters)"
 ```
 
+#### pinRule — custom PIN config
+
+```js
+senseInput("1234", {
+  type: "pin",
+  rules: { pinRule: { noSequential: true } }
+});
+// "PIN must not contain sequential digits"
+```
+
+#### phoneRule — custom phone config
+
+```js
+senseInput("1111111111", {
+  type: "phone",
+  rules: { phoneRule: { noRepeated: true } }
+});
+// "Phone number must not contain repeated digits"
+```
+
+#### passwordStrength — custom password config
+
+```js
+senseInput("Harshit123", {
+  type: "password",
+  rules: { passwordStrength: { requireSpecial: false } }
+});
+// null
+```
+
 ### When to use each mode
 
 | Mode | Returns | Use when |
@@ -402,6 +612,23 @@ senseInput("hello", {
 | `entropy` | `minRatio` | `number` | `0.6` | Min character diversity ratio |
 | `validEmailFormat` | `allowedDomains` | `string[]` | `[]` | Whitelist specific domains |
 | `validEmailFormat` | `blockedDomains` | `string[]` | `[]` | Extra domains to block |
+| `pinRule` | `minLength` | `number` | `4` | Min PIN length |
+| `pinRule` | `maxLength` | `number` | `6` | Max PIN length |
+| `pinRule` | `noRepeated` | `boolean` | `true` | Disallow repeated digits |
+| `pinRule` | `noSequential` | `boolean` | `false` | Disallow sequential digits |
+| `phoneRule` | `minDigits` | `number` | `10` | Min digit count |
+| `phoneRule` | `maxDigits` | `number` | `15` | Max digit count |
+| `phoneRule` | `allowPlus` | `boolean` | `true` | Allow + sign |
+| `phoneRule` | `allowSpaces` | `boolean` | `true` | Allow spaces |
+| `phoneRule` | `allowDashes` | `boolean` | `true` | Allow dashes |
+| `phoneRule` | `allowParens` | `boolean` | `true` | Allow parentheses |
+| `phoneRule` | `noRepeated` | `boolean` | `false` | Disallow repeated digits |
+| `passwordStrength` | `minLength` | `number` | `8` | Min password length |
+| `passwordStrength` | `requireUppercase` | `boolean` | `true` | Require uppercase |
+| `passwordStrength` | `requireLowercase` | `boolean` | `true` | Require lowercase |
+| `passwordStrength` | `requireNumber` | `boolean` | `true` | Require number |
+| `passwordStrength` | `requireSpecial` | `boolean` | `true` | Require special char |
+| `passwordStrength` | `checkCommon` | `boolean` | `true` | Check common passwords |
 
 All rules have safe defaults. Unknown rule names in `rules` config are safely ignored.
 
@@ -479,12 +706,14 @@ It runs a series of small, focused rules to answer one question:
 
 ```
 User Input
-↓
-Regex / Required Validation
-↓
-input-sense (intent detection — with optional type preset)
-↓
-Backend Validation
+    ↓
+input-sense
+• Regex validation (minLength, numericOnly, sequential patterns, etc.)
+• Intent detection (placeholder words, disposable emails, leet-speak, etc.)
+• Optional type presets (email, fullName, pin, phone, password)
+    ↓
+Pass → valid input
+Fail → descriptive error message
 ```
 
 ---
@@ -515,6 +744,9 @@ Backend Validation
 - Educational platforms
 - Frontend UX improvement
 - Pre-API input sanity checks
+- PIN entry forms
+- Phone number collection
+- Password strength indicators
 
 ---
 
@@ -531,6 +763,9 @@ All core validation rules are covered by automated tests and enforced via CI.
 |----------|----------------|
 | Email field | `type: "email"` |
 | Full name field | `type: "fullName"` |
+| PIN field | `type: "pin"` |
+| Phone field | `type: "phone"` |
+| Password field | `type: "password"` |
 | Simple forms | Default mode |
 | Rich UX | `mode: "all"` |
 | Rule-specific UX | `mode: "detailed"` |
