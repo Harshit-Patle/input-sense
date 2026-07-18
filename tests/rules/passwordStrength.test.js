@@ -51,7 +51,7 @@ describe("passwordStrengthRule", () => {
 
     // Custom options
     it("respects custom minLength option", () => {
-        const result = passwordStrengthRule("H@1", { minLength: 3 });
+        const result = passwordStrengthRule("H@1a", { minLength: 3, requireSpecial: true });
         expect(result).toBe(null);
     });
 
@@ -76,7 +76,7 @@ describe("passwordStrengthRule", () => {
     });
 
     it("skips common check when checkCommon is false", () => {
-        const result = passwordStrengthRule("password123", { checkCommon: false });
+        const result = passwordStrengthRule("Password123!", { checkCommon: false });
         expect(result).toBe(null);
     });
 

@@ -528,12 +528,12 @@ it("respects custom phoneRule config via type phone", () => {
 
 // Password preset tests
 it("detects weak password via type password", () => {
-  const result = senseInput("harshit", { type: "password" });
+  const result = senseInput("harshit123", { type: "password" });
   expect(result).toContain("uppercase");
 });
 
 it("detects common password via type password", () => {
-  const result = senseInput("password", { type: "password" });
+  const result = senseInput("Password123!", { type: "password" });
   expect(result).toContain("common");
 });
 
