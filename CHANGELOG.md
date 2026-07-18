@@ -3,6 +3,36 @@
 > ℹ️ Note: Versions prior to 0.4.0 were early experimental releases.
 > This changelog tracks stable, user-facing changes from 0.4.0 onward.
 
+## 0.14.0
+
+### Added
+
+#### New Presets
+- **`type: "pin"`** – PIN validation with configurable length (4–6 digits), no repeated/sequential digits
+- **`type: "phone"`** – International phone validation with 10–15 digits, flexible separators (+, spaces, dashes, parentheses)
+- **`type: "password"`** – Password strength validation with uppercase, lowercase, number, special character checks, and common password blacklist (50+ entries)
+
+#### New Rules
+- `pinRule` – numeric-only PIN validation with configurable options
+- `phoneRule` – phone number validation with digit counting and format options
+- `passwordStrengthRule` – comprehensive password strength validation with common password blacklist
+
+#### TypeScript
+- Added `PinRuleConfig`, `PhoneRuleConfig`, `PasswordStrengthRuleConfig` interfaces
+- Updated `InputType` to include `"pin"`, `"phone"`, `"password"`
+- Updated `RuleName` with new rule names
+
+#### Tests
+- Expanded from 255 to 303 tests
+- 100% coverage on all rule files
+
+### Changed
+- Updated README with all 5 types and examples
+- Updated CHANGELOG with v0.14.0 changes
+
+### No Breaking Changes
+All existing APIs continue to work. The new `type` options are additive.
+
 ## 0.13.0
 
 - Added `type` option with preset system — automatically configures rules for specific input fields
