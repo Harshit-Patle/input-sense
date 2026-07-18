@@ -1,6 +1,6 @@
 export type SenseMode = "first" | "all" | "detailed" | "score";
 
-export type InputType = "email" | "fullName" | "pin";
+export type InputType = "email" | "fullName" | "pin" | "phone";
 
 export type RuleName =
   | "repeatedChar"
@@ -20,7 +20,8 @@ export type RuleName =
   | "validEmailFormat"
   | "spaceRequired"
   | "namePartsRule"
-  | "pinRule";
+  | "pinRule"
+  | "phoneRule";
 
 export interface RepeatedCharRuleConfig {
   threshold?: number;
@@ -75,6 +76,16 @@ export interface PinRuleConfig {
   noSequential?: boolean;
 }
 
+export interface PhoneRuleConfig {
+  minDigits?: number;
+  maxDigits?: number;
+  allowPlus?: boolean;
+  allowSpaces?: boolean;
+  allowDashes?: boolean;
+  allowParens?: boolean;
+  noRepeated?: boolean;
+}
+
 export interface RuleConfigs {
   repeatedChar?: RepeatedCharRuleConfig;
   keyboardPattern?: KeyboardPatternRuleConfig;
@@ -88,6 +99,7 @@ export interface RuleConfigs {
   namePartsRule?: NamePartsRuleConfig;
   spaceRequired?: SpaceRequiredRuleConfig;
   pinRule?: PinRuleConfig;
+  phoneRule?: PhoneRuleConfig;
   // Existing rules without config remain as any or can be added later
   minLength?: { minLength?: number };
   entropy?: { minLength?: number; minEntropy?: number };
