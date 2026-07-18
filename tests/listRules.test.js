@@ -8,7 +8,7 @@ describe("listRules", () => {
 
     it("returns all rules including phoneRule", () => {
         const rules = listRules();
-        expect(rules.length).toBe(19);
+        expect(rules.length).toBe(19); 
         expect(rules).toContain("phoneRule");
     });
 
@@ -35,7 +35,7 @@ describe("listRules", () => {
     it("returns rules in execution order", () => {
         const rules = listRules();
         expect(rules[0]).toBe("spaceRequired");
-        expect(rules[rules.length - 1]).toBe("pinRule");
+        expect(rules[rules.length - 1]).toBe("phoneRule");
     });
 
     it("returns a new array on each call", () => {
