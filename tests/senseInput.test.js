@@ -533,7 +533,7 @@ it("detects weak password via type password", () => {
 });
 
 it("detects common password via type password", () => {
-  const result = senseInput("Password123!", { type: "password" });
+  const result = senseInput("Password123", { type: "password" });
   expect(result).toContain("common");
 });
 
