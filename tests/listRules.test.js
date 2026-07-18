@@ -6,10 +6,10 @@ describe("listRules", () => {
         expect(Array.isArray(listRules())).toBe(true);
     });
 
-    it("returns all rules including pinRule", () => {
+    it("returns all rules including phoneRule", () => {
         const rules = listRules();
-        expect(rules.length).toBe(18);
-        expect(rules).toContain("pinRule");
+        expect(rules.length).toBe(19);
+        expect(rules).toContain("phoneRule");
     });
 
     it("contains all expected rule names", () => {

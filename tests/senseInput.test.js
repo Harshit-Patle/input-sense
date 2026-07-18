@@ -491,3 +491,37 @@ it("respects custom pinRule config via type pin", () => {
   });
   expect(result).toBe(null);
 });
+
+// Phone preset tests
+it("detects invalid phone format via type phone", () => {
+  const result = senseInput("123", { type: "phone" });
+  expect(result).toContain("Phone number must contain at least 10 digits");
+});
+
+it("detects letters in phone via type phone", () => {
+  const result = senseInput("abc123", { type: "phone" });
+  expect(result).toContain("Phone number must contain only numbers and valid separators");
+});
+
+it("returns null for valid 10-digit phone via type phone", () => {
+  const result = senseInput("1234567890", { type: "phone" });
+  expect(result).toBe(null);
+});
+
+it("returns null for formatted phone via type phone", () => {
+  const result = senseInput("(123) 456-7890", { type: "phone" });
+  expect(result).toBe(null);
+});
+
+it("returns null for international phone via type phone", () => {
+  const result = senseInput("+1 234-567-8900", { type: "phone" });
+  expect(result).toBe(null);
+});
+
+it("respects custom phoneRule config via type phone", () => {
+  const result = senseInput("1111111111", {
+    type: "phone",
+    rules: { phoneRule: { noRepeated: true } }
+  });
+  expect(result).toContain("Phone number must not contain repeated digits");
+});
