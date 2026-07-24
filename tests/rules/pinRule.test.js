@@ -95,4 +95,11 @@ describe("pinRule", () => {
     it("returns null for whitespace-only input", () => {
         expect(pinRule(" ")).toBe(null);
     });
+
+    it("flags common PINs", () => {
+        expect(pinRule("1234")).toBeTruthy();
+        expect(pinRule("1111")).toBeTruthy();
+        expect(pinRule("2580")).toBeTruthy();
+        expect(pinRule("123456")).toBeTruthy();
+    });
 });

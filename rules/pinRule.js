@@ -1,3 +1,10 @@
+const COMMON_PINS = [
+    "1234", "1111", "0000", "1212", "2580", "5555", "2222", "3333",
+    "4444", "7777", "8888", "9999", "4321", "1122", "1221", "2112",
+    "123456", "111111", "000000", "123123", "654321", "1010", "2020",
+    "112233", "123321", "456789", "789456"
+];
+
 export function pinRule(value, options = {}) {
     if (!value) return null;
 
@@ -46,6 +53,11 @@ export function pinRule(value, options = {}) {
         if (isSequential || isReverseSequential) {
             return "PIN must not contain sequential digits";
         }
+    }
+
+    // Check: Common PIN blacklist
+    if (COMMON_PINS.includes(normalized)) {
+        return "PIN is too common and easily guessable";
     }
 
     return null;
