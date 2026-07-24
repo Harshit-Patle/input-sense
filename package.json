@@ -41,6 +41,7 @@
     "index.js",
     "index.d.ts",
     "rules",
+    "presets",
     "dist"
   ],
   "devDependencies": {
