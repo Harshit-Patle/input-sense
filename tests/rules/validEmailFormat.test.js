@@ -176,4 +176,8 @@ describe("validEmailFormatRule", () => {
         expect(validEmailFormatRule("😊@gmail.com")).toBeTruthy();
         expect(validEmailFormatRule("hello😊@gmail.com")).toBeTruthy();
     });
+
+    it("flags TLD longer than 8 chars", () => {
+        expect(validEmailFormatRule("user@domain.abcdefghi")).toBeTruthy();
+    });
 });

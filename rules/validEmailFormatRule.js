@@ -75,6 +75,11 @@ export function validEmailFormatRule(value, blockedDomains = [], allowedDomains 
     if (!domainName || domainName.length < 2) return "Input does not look like a valid email address";
     if (/^[0-9]+$/.test(domainName)) return "Input does not look like a valid email address";
 
+    // Check: TLD max length (8 chars)
+    if (tld.length > 8) {
+        return "Input does not look like a valid email address";
+    }
+
     // Check 7 — digits in domain name (catches gmai1, g00gle etc)
     if (/[0-9]/.test(domainName)) {
         return "Input does not look like a valid email address";
