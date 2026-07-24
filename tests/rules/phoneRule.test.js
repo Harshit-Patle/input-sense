@@ -108,4 +108,8 @@ describe("phoneRule", () => {
         expect(phoneRule("+1+234567890")).toBeTruthy();
         expect(phoneRule("+1+234+567+890")).toBeTruthy();
     });
+    
+    it("flags empty parentheses", () => {
+        expect(phoneRule("()1234567890")).toBeTruthy();
+    });
 });

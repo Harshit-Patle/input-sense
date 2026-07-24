@@ -27,6 +27,11 @@ export function phoneRule(value, options = {}) {
         return "Phone number must contain only numbers and valid separators";
     }
 
+    // Check: Empty parentheses
+    if (normalized.includes("()")) {
+        return "Phone number must not contain empty parentheses";
+    }
+
     // Check: Multiple '+' signs
     if (allowPlus && (normalized.match(/\+/g) || []).length > 1) {
         return "Phone number can only have one '+' sign";
