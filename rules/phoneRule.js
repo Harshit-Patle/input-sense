@@ -27,6 +27,11 @@ export function phoneRule(value, options = {}) {
         return "Phone number must contain only numbers and valid separators";
     }
 
+    // Check: Consecutive separators
+    if (/[\s\-()]{2,}/.test(normalized)) {
+        return "Phone number contains invalid format";
+    }
+
     // Check: Empty parentheses
     if (normalized.includes("()")) {
         return "Phone number must not contain empty parentheses";
