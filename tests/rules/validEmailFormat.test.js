@@ -171,4 +171,9 @@ describe("validEmailFormatRule", () => {
     it("returns null for whitespace-only input", () => {
         expect(validEmailFormatRule("   ")).toBe(null);
     });
+
+    it("flags emojis in local part", () => {
+        expect(validEmailFormatRule("😊@gmail.com")).toBeTruthy();
+        expect(validEmailFormatRule("hello😊@gmail.com")).toBeTruthy();
+    });
 });

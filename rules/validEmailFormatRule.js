@@ -50,6 +50,11 @@ export function validEmailFormatRule(value, blockedDomains = [], allowedDomains 
     if (local.startsWith(".") || local.endsWith(".")) return "Input does not look like a valid email address";
     if (local.includes("..")) return "Input does not look like a valid email address";
 
+    // Check: No emojis or non-ASCII characters in local part
+    if (/[\u{1F600}-\u{1F9FF}]/u.test(local) || /[^\x00-\x7F]/.test(local)) {
+        return "Input does not look like a valid email address";
+    }
+
     // Check 5 — domain basic checks
     if (!domain || !domain.includes(".")) return "Input does not look like a valid email address";
     if (domain.startsWith(".") || domain.endsWith(".")) return "Input does not look like a valid email address";
