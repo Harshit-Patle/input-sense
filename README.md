@@ -3,6 +3,7 @@
 ![coverage](https://codecov.io/gh/Harshit-Patle/input-sense/branch/main/graph/badge.svg)
 ![CI](https://github.com/Harshit-Patle/input-sense/actions/workflows/ci.yml/badge.svg)
 ![license](https://img.shields.io/github/license/Harshit-Patle/input-sense)
+[![Playground](https://img.shields.io/badge/Playground-Try%20Now-blueviolet)](https://input-sense-playground.vercel.app)
 
 ---
 
