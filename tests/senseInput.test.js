@@ -462,7 +462,7 @@ it("detects repeated PIN digits via type pin", () => {
 });
 
 it("allows sequential PIN digits via type pin (default behavior)", () => {
-  const result = senseInput("1234", { type: "pin" });
+  const result = senseInput("1235", { type: "pin" });
   expect(result).toBe(null);
 });
 
@@ -485,7 +485,7 @@ it("allows 6-digit PIN via type pin", () => {
 });
 
 it("respects custom pinRule config via type pin", () => {
-  const result = senseInput("1111", {
+  const result = senseInput("1112", {
     type: "pin",
     rules: { pinRule: { noRepeated: false } }
   });

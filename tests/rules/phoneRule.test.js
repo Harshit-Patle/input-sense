@@ -21,6 +21,7 @@ describe("phoneRule", () => {
 
     it("returns null for phone with parentheses", () => {
         expect(phoneRule("(123) 456-7890")).toBe(null);
+        expect(phoneRule("(123)456-7890")).toBe(null);
     });
 
     it("returns null for phone with plus sign", () => {
