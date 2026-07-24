@@ -15,8 +15,10 @@ describe("pinRule", () => {
     });
 
     it("allows non-sequential PIN with repeated digits", () => {
+        // These should not be in the common PIN list
         expect(pinRule("1112")).toBe(null);
-        expect(pinRule("1122")).toBe(null);
+        expect(pinRule("1123")).toBe(null);
+        expect(pinRule("1223")).toBe(null);
     });
 
     // Non-numeric
