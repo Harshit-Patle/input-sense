@@ -3,6 +3,30 @@
 > ℹ️ Note: Versions prior to 0.4.0 were early experimental releases.
 > This changelog tracks stable, user-facing changes from 0.4.0 onward.
 
+## 0.15.0
+
+### Fixed
+
+#### Email
+- Blocked emojis and non-ASCII characters in local part (`😊@gmail.com` → fail)
+- Added max TLD length (8 chars) – `user@domain.abcdefghi` → fail
+
+#### PIN
+- Added common PIN blacklist – `1234`, `1111`, `2580`, `123456` etc. → fail
+- `1478`, `3691`, `9876` are NOT blocked (valid non-common PINs)
+
+#### Phone
+- Added validation for multiple `+` signs (`+1+234567890` → fail)
+- Added validation for empty parentheses (`()1234567890` → fail)
+- Added validation for consecutive separators (`123--456-7890` → fail)
+
+#### Tests
+- Expanded test coverage for all fixes
+- All 309 tests passing
+
+### No Breaking Changes
+All existing APIs continue to work.
+
 ## 0.14.0
 
 ### Added

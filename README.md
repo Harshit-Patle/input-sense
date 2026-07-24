@@ -145,6 +145,12 @@ senseInput("test+123@gmail.com", { type: "email" })
 
 senseInput("harshit+work@gmail.com", { type: "email" })
 // null — legitimate plus tag
+
+senseInput("😊@gmail.com", { type: "email" })
+// "Input does not look like a valid email address"
+
+senseInput("user@domain.abcdefghi", { type: "email" })
+// "Input does not look like a valid email address"
 ```
 
 **Email config options:**
@@ -178,6 +184,8 @@ senseInput("user@competitor.com", {
 - No all-numeric local parts, no consecutive dots, no leading/trailing dots
 - Domain name cannot contain digits (catches `gmai1.com`, `g00gle.com`)
 - Domain cannot start or end with hyphens
+- **Emojis and non-ASCII characters blocked in local part** (`😊@gmail.com` → fail)
+- **Max TLD length: 8 characters** (`user@domain.abcdefghi` → fail)
 - 33 built-in blocked disposable domains
 - Blocked system addresses: `noreply`, `postmaster`, `support`, `admin`, `info` and more
 - Placeholder detection in local part segments (`test.user@`, `demo_app@`)
@@ -268,6 +276,12 @@ senseInput("1234567", { type: "pin" })
 
 senseInput("abcd", { type: "pin" })
 // "PIN must contain only numbers"
+
+senseInput("2580", { type: "pin" })
+// "PIN is too common and easily guessable"
+
+senseInput("112233", { type: "pin" })
+// "PIN is too common and easily guessable"
 ```
 
 **PIN config options:**
@@ -294,6 +308,7 @@ senseInput("1111", {
 - No repeated digits (configurable, default: true)
 - No sequential digits (configurable, default: false)
 - Configurable min/max length
+- **Common PIN blacklist** — `1234`, `1111`, `2580`, `112233`, `123456` etc. blocked
 
 ---
 
@@ -322,6 +337,15 @@ senseInput("abc123", { type: "phone" })
 
 senseInput("1111111111", { type: "phone" })
 // null — repeated digits allowed by default
+
+senseInput("+1+234567890", { type: "phone" })
+// "Phone number can only have one '+' sign"
+
+senseInput("()1234567890", { type: "phone" })
+// "Phone number must not contain empty parentheses"
+
+senseInput("123--456-7890", { type: "phone" })
+// "Phone number contains invalid format"
 ```
 
 **Phone config options:**
@@ -348,6 +372,9 @@ senseInput("12345", {
 - No letters allowed
 - Repeated digits check (configurable, default: false)
 - International format support
+- **Multiple `+` signs blocked** (`+1+234567890` → fail)
+- **Empty parentheses blocked** (`()1234567890` → fail)
+- **Consecutive separators blocked** (`123--456-7890` → fail)
 
 ---
 
