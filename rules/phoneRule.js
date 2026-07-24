@@ -27,8 +27,8 @@ export function phoneRule(value, options = {}) {
         return "Phone number must contain only numbers and valid separators";
     }
 
-    // Check: Consecutive separators
-    if (/[\s\-()]{2,}/.test(normalized)) {
+    // Check: Consecutive same separators (e.g., "--", "  ", "()" but not ") ")
+    if (/(--|\s\s|\(\s*\)|\+\+)/.test(normalized)) {
         return "Phone number contains invalid format";
     }
 
