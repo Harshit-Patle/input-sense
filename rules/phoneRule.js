@@ -27,6 +27,11 @@ export function phoneRule(value, options = {}) {
         return "Phone number must contain only numbers and valid separators";
     }
 
+    // Check: Multiple '+' signs
+    if (allowPlus && (normalized.match(/\+/g) || []).length > 1) {
+        return "Phone number can only have one '+' sign";
+    }
+
     // Check 2: Count digits only
     const digitsOnly = normalized.replace(/\D/g, "");
     if (digitsOnly.length < minDigits) {

@@ -103,4 +103,9 @@ describe("phoneRule", () => {
         const result = phoneRule("(123) 456-7890", { allowParens: false });
         expect(result).toBeTruthy();
     });
+
+    it("flags multiple '+' signs", () => {
+        expect(phoneRule("+1+234567890")).toBeTruthy();
+        expect(phoneRule("+1+234+567+890")).toBeTruthy();
+    });
 });
