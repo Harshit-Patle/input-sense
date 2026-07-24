@@ -6,7 +6,7 @@ describe("pinRule", () => {
     it("returns null for valid 4-digit PIN", () => {
         expect(pinRule("1478")).toBe(null);
         expect(pinRule("2580")).toBeTruthy();
-        expect(pinRule("9876")).toBe(null);
+        expect(pinRule("3691")).toBe(null);
     });
 
     it("returns null for valid 6-digit PIN", () => {

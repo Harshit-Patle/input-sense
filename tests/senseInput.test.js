@@ -475,7 +475,7 @@ it("flags sequential PIN digits when noSequential is true", () => {
 });
 
 it("returns null for valid PIN via type pin", () => {
-  const result = senseInput("1478", { type: "pin" });
+  const result = senseInput("3691", { type: "pin" });
   expect(result).toBe(null);
 });
 
